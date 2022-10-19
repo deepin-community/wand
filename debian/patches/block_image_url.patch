@@ -1,0 +1,98 @@
+From: Håvard Flaget Aasen <haavard_aasen@yahoo.no>
+Date: Mon, 16 Dec 2019 21:04:10 +0100
+Subject: Removes image url from upstream.
+
+Prevents fetching data from an external website at runtime.
+Last-Update: 2020-09-22
+Forwarded: not-needed
+---
+ docs/_static/wand.css       |  3 +--
+ docs/_templates/layout.html |  2 --
+ docs/index.rst              | 19 -------------------
+ docs/test.rst               |  6 ------
+ 4 files changed, 1 insertion(+), 29 deletions(-)
+
+diff --git a/docs/_static/wand.css b/docs/_static/wand.css
+index d7c306e..830b3f0 100644
+--- a/docs/_static/wand.css
++++ b/docs/_static/wand.css
+@@ -1,5 +1,4 @@
+ 
+-@import url(http://fonts.googleapis.com/css?family=Sunshiney);
+ @import url(flasky.css);
+ 
+ .indexwrapper .sphinxsidebar .github-line { visibility: hidden; }
+@@ -19,4 +18,4 @@ div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6
+   { font-family: 'Sunshiney', 'Garamond', 'Georgia', serif; }
+ 
+ .literal-block .subscript { vertical-align: sub; }
+-.literal-block .supscript { vertical-align: super; }
+\ No newline at end of file
++.literal-block .supscript { vertical-align: super; }
+diff --git a/docs/_templates/layout.html b/docs/_templates/layout.html
+index acfaecc..419c534 100644
+--- a/docs/_templates/layout.html
++++ b/docs/_templates/layout.html
+@@ -3,8 +3,6 @@
+ {% block sidebarlogo %}
+   {% if pagename == 'index' %}
+     <iframe
+-      src="http://ghbtns.com/github-btn.html?user=emcconville&repo=wand{{- '' -}}
+-           &type=watch&count=true&size=large"
+       allowtransparency="true" frameborder="0" scrolling="0"
+       width="170px" height="30px">
+       {{- '' -}}
+diff --git a/docs/index.rst b/docs/index.rst
+index 3e86dc2..2bce3db 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -1,25 +1,6 @@
+ Wand
+ ====
+ 
+-.. image:: https://badge.fury.io/py/Wand.svg?
+-   :alt: Latest PyPI version
+-   :target: https://pypi.python.org/pypi/Wand
+-
+-.. image:: https://readthedocs.org/projects/wand/badge/
+-   :alt: Documentation Status
+-   :target: https://docs.wand-py.org/en/latest/
+-
+-.. image:: https://secure.travis-ci.org/emcconville/wand.svg?branch=master
+-   :alt: Build Status
+-   :target: https://travis-ci.org/emcconville/wand
+-
+-.. image:: https://github.com/emcconville/wand/workflows/Wand%20CI/badge.svg
+-   :alt: Build Status
+-   :target: https://github.com/emcconville/wand/actions?query=workflow%3A%22Wand+CI%22
+-
+-.. image:: https://img.shields.io/coveralls/emcconville/wand.svg?style=flat
+-   :alt: Coverage Status
+-   :target: https://coveralls.io/r/emcconville/wand
+ 
+ Wand is a :mod:`ctypes`-based simple ImageMagick_ binding for Python. ::
+ 
+diff --git a/docs/test.rst b/docs/test.rst
+index d7c7fd5..de3b486 100644
+--- a/docs/test.rst
++++ b/docs/test.rst
+@@ -107,9 +107,6 @@ You can use a double ``--`` to pass options to pytest:
+ Continuous Integration
+ ----------------------
+ 
+-.. image:: https://secure.travis-ci.org/emcconville/wand.svg?branch=master
+-   :alt: Build Status
+-   :target: https://travis-ci.org/emcconville/wand
+ 
+ `Travis CI`_ automatically builds and tests every commit and pull request.
+ The above banner image shows the current status of Wand build.
+@@ -123,9 +120,6 @@ https://travis-ci.org/emcconville/wand
+ Code Coverage
+ -------------
+ 
+-.. image:: https://img.shields.io/coveralls/emcconville/wand.svg?style=flat
+-   :alt: Coverage Status
+-   :target: https://coveralls.io/r/emcconville/wand
+ 
+ Coveralls_ support tracking Wand's test coverage.  The above banner image
+ shows the current status of Wand coverage.  You can see the details of the

@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+export PYBUILD_NAME=wand
+export PYBUILD_DISABLE_pypy=test
+
+%:
+	dh $@ --buildsystem=pybuild --with python3,pypy,sphinxdoc
+
+execute_after_dh_auto_build:
+ifeq (,$(filter nodoc,$(DEB_BUILD_PROFILES)))
+	$(MAKE) -C $(CURDIR)/docs html
+	find $(CURDIR)/docs/_build/html -mindepth 2 -maxdepth 2 -type f | xargs sed -i 's;https://cdnjs.*HTMLorMML;../_static/mathjax.js;g'
+	find $(CURDIR)/docs/_build/html -maxdepth 1 -type f | xargs sed -i 's;https://cdnjs.*HTMLorMML;_static/mathjax.js;g'
+endif
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_PROFILES)))
+	dh_auto_test
+endif
+
+execute_after_dh_auto_clean:
+	$(MAKE) -C $(CURDIR)/docs clean

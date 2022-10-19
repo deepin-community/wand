@@ -1,0 +1,313 @@
+wand (0.6.7-1) unstable; urgency=medium
+
+  * New upstream version 0.6.7
+  * Rebase patch
+  * d/control: Update Standards-Version to 4.6.0
+  * Re-enable all tests.
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Thu, 19 Aug 2021 09:11:05 +0200
+
+wand (0.6.5-1) unstable; urgency=medium
+
+  * New upstream version 0.6.5
+  * d/source/options: Exclude *.egg-info files
+  * d/rules, autopkgtest: Change arguments for pytest regarding
+    the '-k' flag Closes: #977100
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Sat, 02 Jan 2021 22:27:31 +0100
+
+wand (0.6.4-1) unstable; urgency=medium
+
+  * New upstream version 0.6.4
+    - Fixes test failure on s390x LP: #1904899
+  * d/control: Update Standards-Version to 4.5.1
+  * d/rules: Test gaussian_blur on all archs.
+  * autopkgtest: Skip test_limits
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Thu, 26 Nov 2020 16:19:43 +0100
+
+wand (0.6.3-1) unstable; urgency=medium
+
+  * New upstream version 0.6.3
+  * Rebase patches
+  * d/salsa-ci.yml: Disable kernel variation in reprotest
+  * Build-Profiles: Add nocheck
+  * d/rules: Disable two tests for armhf and i386,
+    needed for reproducible builds
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Wed, 23 Sep 2020 08:52:10 +0200
+
+wand (0.6.2-1) unstable; urgency=medium
+
+  * New upstream version 0.6.2
+  * Disable failing test Closes: #966982
+    Broken test, not broken package.
+  * Add 'nodoc' as Build-Profile
+  * Set upstream metadata fields: Bug-Submit.
+  * Update salsa CI
+    - Watch all variations of reprotest.
+  * Use spaces rather than tabs in d/copyright
+  * Rebase patches
+  * flask sphinx theme is now in the upstream repository
+    - Remove patch and lintian-override
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Thu, 03 Sep 2020 10:46:40 +0200
+
+wand (0.6.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Enable testsuite for python3 Closes: #761325
+  * Update package description
+  * Bump debhelper to 13
+  * Clean-up in d/rules
+  * Mark doc package as Multi-Arch: foreign
+  * Add libjs-mathjax as runtime-dependency for doc package
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Wed, 20 May 2020 17:40:01 +0200
+
+wand (0.5.9-2) unstable; urgency=medium
+
+  * Minor tweak for autopkgtest. closes: #954483
+    - Update dependencies
+    - Change to test supported Python3 versions
+  * Add libmagickcore-6.q16-6-extra as Suggests in d/control
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Sat, 21 Mar 2020 19:11:45 +0100
+
+wand (0.5.9-1) unstable; urgency=medium
+
+  * New upstream version 0.5.9
+  * Update Standards-Version to 4.5.0
+  * Set upstream metadata fields: Bug-Database, Repository,
+    Repository-Browse.
+  * Remove linux-distro.patch. Fixed upstream
+  * Remove unnecessary version control on build-dependencies.
+  * Remove python3-distro from runtime-dependencies.
+  * Simplify dh_auto_clean and dh_auto_build target in d/rules
+  * d/copyright update year and add Upstream-Contact
+  * Add upstream testsuite as autopkgtest.
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Mon, 17 Feb 2020 12:42:10 +0100
+
+wand (0.5.8-1) unstable; urgency=medium
+
+  * New upstream version 0.5.8
+  * Add lintian-overrides for empty folder, docs/_themes/*
+  * Set myself as maintainer closes: #934012
+  * Add autopkgtest-pkg-python
+  * Change how testsuite is being disabled
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Mon, 16 Dec 2019 22:09:33 +0100
+
+wand (0.5.7-2) unstable; urgency=medium
+
+  * QA upload.
+  * Added patch linux-distro.patch. Closes: 944527
+    - Thanks to Matthias Klose for patch.
+  * Added python3-distro as dependency.
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Mon, 11 Nov 2019 16:38:32 +0100
+
+wand (0.5.7-1) unstable; urgency=medium
+
+  * QA upload.
+  * New upstream release.
+  * Update d/watch to version 4
+  * Clean gbp.conf
+  * Update to debhelper-compat and removed d/compat
+  * Update dh-helper to 12
+  * Fix MathJax replacement.
+  * Added patch to prevent fetching data at runtime.
+  * Added Rules-Requires-Root: no, to d/control.
+
+ -- Håvard Flaget Aasen <haavard_aasen@yahoo.no>  Fri, 08 Nov 2019 16:27:43 +0100
+
+wand (0.5.5-2) unstable; urgency=medium
+
+  * QA upload.
+  * Drop python2 support; Closes: #938808
+  * Update Maintainer to QA
+  * Bump Standards-Version to 4.4.1 (no changes needed)
+
+ -- Sandro Tosi <morph@debian.org>  Thu, 24 Oct 2019 20:02:52 -0400
+
+wand (0.5.5-1) unstable; urgency=medium
+
+  [ Changwoo Ryu ]
+  * New upstream version
+    - Supports libmagickwand-6.q16hdri-6
+  * debian/salsa-ci.yml: Add Salsa CI
+
+  [ Ondřej Nový ]
+  * d/copyright: Use https protocol in Format field
+
+ -- Changwoo Ryu <cwryu@debian.org>  Fri, 19 Jul 2019 23:48:09 -0300
+
+wand (0.4.4-3) unstable; urgency=medium
+
+  * Fix lib name typo; libmagickcore -> libmagickwand (Closes: #904921)
+  * Remove Build-Depends packages for testsuite
+  * Standards-Version: 4.1.5
+
+ -- Changwoo Ryu <cwryu@debian.org>  Tue, 31 Jul 2018 12:16:01 +0800
+
+wand (0.4.4-2) unstable; urgency=medium
+
+  * Update dependencies on libmagicwand to libmagickwand-6.q16-6 (Closes:
+    #904012)
+  * Use salsa.d.o for Vcs-*.
+  * Depends on python3-sphinx instead of python-sphinx.
+  * Remove X-Python-Version: >= 2.6 and X-Python3-Version: >= 3.2, which
+    are satisfied by Debian oldstable and not needed anymore.
+
+ -- Changwoo Ryu <cwryu@debian.org>  Thu, 26 Jul 2018 18:30:30 +0800
+
+wand (0.4.4-1.3) unstable; urgency=medium
+
+  * Non-maintainer upload.
+
+  [ Michal Arbet ]
+  * Add fix-ensure-sequence-is-allocated.patch (Closes: #903908)
+
+ -- Michal Arbet <michal.arbet@ultimum.io>  Mon, 16 Jul 2018 13:47:50 +0100
+
+wand (0.4.4-1.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+
+  [ Dmitry Shachnev ]
+  * Use dh-sphinxdoc instead of broken hardcoded linking (Closes: #857510).
+
+  [ Changwoo Ryu ]
+  * Drop devhelp
+
+  [ HIGUCHI Daisuke (VDR dai) ]
+  * Update dependencies on libmagickwand from libmagickwand-6.q16-3 to
+    libmagickwand-6.q16-5.  Closes: #890956
+
+ -- HIGUCHI Daisuke (VDR dai) <dai@debian.org>  Wed, 28 Mar 2018 22:05:08 +0900
+
+wand (0.4.4-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Update dependencies on libmagickwand from libmagickwand-6.q16-2 to
+    libmagickwand-6.q16-3.  Closes: #850815
+
+ -- Mattia Rizzolo <mattia@debian.org>  Wed, 11 Jan 2017 10:15:07 +0100
+
+wand (0.4.4-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/control: Correct the Vcs-*: URI
+  * Use pybuild
+    - The testsuite is disabled for now; it fails on the ImageMagick 6.8.* or
+      later
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sun, 06 Nov 2016 18:02:18 +0900
+
+wand (0.4.3-1) unstable; urgency=medium
+
+  * New upstream release
+  * Fix TypeError on ImageMagick 6.9.6.2 (Closes: #841548)
+  * Standards-Version: 3.9.8
+  * Fix lintian errors
+    - debian/control: Use https protocol for Vcs-* fields
+    - debian/copyright: Fix the copyright format
+  * debian/gbp.conf: upstream-0.4 branch for upstream
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sat, 22 Oct 2016 18:59:14 +0900
+
+wand (0.3.9-1) unstable; urgency=medium
+
+  * New upstream release
+  * Clean built files (Closes: #761464)
+  * Install the upstream changelog file
+  * Standards-Version: 3.9.6
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sat, 27 Dec 2014 21:55:39 +0900
+
+wand (0.3.8-2) unstable; urgency=medium
+
+  * Add optional dependency on libmagickwand-6.q16-2 (Closes: #761104)
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sat, 13 Sep 2014 04:02:44 +0900
+
+wand (0.3.8-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sun, 03 Aug 2014 05:45:35 +0900
+
+wand (0.3.7-1) unstable; urgency=medium
+
+  * New upstream release
+  * Standards-Version: 3.9.5
+  * Add flask-sphinx-themes; from the upstream git submodule
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sun, 20 Jul 2014 07:03:22 +0900
+
+wand (0.3.5-1) unstable; urgency=low
+
+  * New upstream release
+  * Use pypy support from dh-python
+  * No more need to link images in doc to save the size
+
+ -- Changwoo Ryu <cwryu@debian.org>  Wed, 18 Sep 2013 05:59:53 +0900
+
+wand (0.3.3-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sun, 04 Aug 2013 19:49:30 +0900
+
+wand (0.3.2-1) unstable; urgency=low
+
+  * New upstream release
+  * Add Build-Depends on python*-setuptools
+
+ -- Changwoo Ryu <cwryu@debian.org>  Thu, 18 Jul 2013 01:35:52 +0900
+
+wand (0.3.0-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/control: update Vcs-* fields to use the canonical URIs
+  * Add python3- and pypy- packages
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sun, 23 Jun 2013 02:08:25 +0900
+
+wand (0.2.4-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/watch: Add uversionmangle for some upstream versions
+
+ -- Changwoo Ryu <cwryu@debian.org>  Thu, 30 May 2013 12:13:12 +0900
+
+wand (0.2.3-1) unstable; urgency=low
+
+  * New upstream release
+  * Fix FTBFS w/ python3-sphinx (Closes: #697786)
+  * Add git-buildpackage config, debian/gbp.conf.
+  * Update github tarball link pattern in debian/watch
+  * Clean up
+    - Add document clean rule in debian/rules
+    - Improve package description based on the document
+    - Update copyright years
+  * Standards-Version: 3.9.4
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sat, 26 Jan 2013 00:55:07 +0900
+
+wand (0.2.2-2) unstable; urgency=low
+
+  * python-wand and wand-doc suggest each other
+  * Use debhelper 9
+  * Add doc-base entry for wand-doc
+  * Use HTML built for Devhelp
+  * Replace duplicated images with symlinks
+
+ -- Changwoo Ryu <cwryu@debian.org>  Sun, 21 Oct 2012 03:34:02 +0900
+
+wand (0.2.2-1) unstable; urgency=low
+
+  * Initial release (Closes: #688897)
+
+ -- Changwoo Ryu <cwryu@debian.org>  Tue, 02 Oct 2012 10:22:20 +0900

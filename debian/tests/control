@@ -1,0 +1,6 @@
+Tests: upstream
+Depends: python3-all,
+         python3-wand,
+         python3-pytest,
+         libmagickwand-6.q16-6,
+         libmagickcore-6.q16-6-extra

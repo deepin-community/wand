@@ -1,0 +1,10 @@
+Document: wand-doc
+Title: Wand Manual
+Author: Hong Minhee
+Abstract: Wand is a ctypes-based simple ImageMagick binding for
+ Python.
+Section: Programming/Python
+
+Format: HTML
+Index: /usr/share/doc/wand-doc/html/index.html
+Files: /usr/share/doc/wand-doc/html/*.html /usr/share/doc/wand-doc/html/*/*.html
