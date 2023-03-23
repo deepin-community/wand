@@ -1,16 +1,16 @@
-From: Håvard Flaget Aasen <haavard_aasen@yahoo.no>
+From: =?utf-8?b?IkjDpXZhcmQgRi4gQWFzZW4i?= <havard.f.aasen@pfft.no>
 Date: Mon, 16 Dec 2019 21:04:10 +0100
 Subject: Removes image url from upstream.
 
 Prevents fetching data from an external website at runtime.
-Last-Update: 2020-09-22
+
 Forwarded: not-needed
 ---
  docs/_static/wand.css       |  3 +--
  docs/_templates/layout.html |  2 --
- docs/index.rst              | 19 -------------------
+ docs/index.rst              | 20 --------------------
  docs/test.rst               |  6 ------
- 4 files changed, 1 insertion(+), 29 deletions(-)
+ 4 files changed, 1 insertion(+), 30 deletions(-)
 
 diff --git a/docs/_static/wand.css b/docs/_static/wand.css
 index d7c306e..830b3f0 100644
@@ -43,10 +43,10 @@ index acfaecc..419c534 100644
        width="170px" height="30px">
        {{- '' -}}
 diff --git a/docs/index.rst b/docs/index.rst
-index 3e86dc2..2bce3db 100644
+index ea2bd8f..7b2f5b5 100644
 --- a/docs/index.rst
 +++ b/docs/index.rst
-@@ -1,25 +1,6 @@
+@@ -1,26 +1,6 @@
  Wand
  ====
  
@@ -58,9 +58,9 @@ index 3e86dc2..2bce3db 100644
 -   :alt: Documentation Status
 -   :target: https://docs.wand-py.org/en/latest/
 -
--.. image:: https://secure.travis-ci.org/emcconville/wand.svg?branch=master
+-.. image:: https://app.travis-ci.com/emcconville/wand.svg?branch=master
 -   :alt: Build Status
--   :target: https://travis-ci.org/emcconville/wand
+-   :target: https://app.travis-ci.com/emcconville/wand
 -
 -.. image:: https://github.com/emcconville/wand/workflows/Wand%20CI/badge.svg
 -   :alt: Build Status
@@ -69,9 +69,10 @@ index 3e86dc2..2bce3db 100644
 -.. image:: https://img.shields.io/coveralls/emcconville/wand.svg?style=flat
 -   :alt: Coverage Status
 -   :target: https://coveralls.io/r/emcconville/wand
- 
+-
  Wand is a :mod:`ctypes`-based simple ImageMagick_ binding for Python. ::
  
+     from wand.image import Image
 diff --git a/docs/test.rst b/docs/test.rst
 index d7c7fd5..de3b486 100644
 --- a/docs/test.rst

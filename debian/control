@@ -1,29 +1,27 @@
 Source: wand
 Section: python
 Priority: optional
-Maintainer: Håvard Flaget Aasen <haavard_aasen@yahoo.no>
+Maintainer: Håvard F. Aasen <havard.f.aasen@pfft.no>
 Build-Depends: debhelper-compat (=13),
                dh-python,
-               libmagickcore-6.q16-6-extra <!nodoc> <!nocheck>,
-               libmagickwand-6.q16-6 <!nodoc> <!nocheck>,
-               pypy,
+               libmagickwand-6.q16-6,
                python3-all,
-               python3-pytest <!nocheck>,
+               python3-pytest,
                python3-setuptools,
-               python3-sphinx
-Standards-Version: 4.6.0
+               python3-sphinx,
+Standards-Version: 4.6.2
 Rules-Requires-Root: no
-Testsuite: autopkgtest-pkg-python
 Homepage: https://github.com/emcconville/wand
 Vcs-Git: https://salsa.debian.org/debian/wand.git
 Vcs-Browser: https://salsa.debian.org/debian/wand
 
 Package: python3-wand
 Architecture: all
-Depends: ${python3:Depends}, ${misc:Depends},
-         libmagickwand-6.q16-6 | libmagickwand-6.q16hdri-6
-Suggests: wand-doc,
-          libmagickcore-6.q16-6-extra
+Depends: libmagickwand-6.q16-6 | libmagickwand-6.q16hdri-6,
+         ${misc:Depends},
+         ${python3:Depends},
+Suggests: libmagickcore-6.q16-6-extra,
+          wand-doc,
 Description: Python interface for ImageMagick library (Python 3)
  Wand is a ctypes-based simple ImageMagick binding for Python. All
  functionalities of MagickWand API are implemented in Wand.
@@ -33,29 +31,13 @@ Description: Python interface for ImageMagick library (Python 3)
  .
  This module is built for Python 3.
 
-Package: pypy-wand
-Architecture: all
-Depends: ${pypy:Depends}, ${misc:Depends},
-         libmagickwand-6.q16-6 | libmagickwand-6.q16hdri-6
-Suggests: wand-doc,
-          libmagickcore-6.q16-6-extra
-Description: Python interface for ImageMagick library (PyPy)
- Wand is a ctypes-based simple ImageMagick binding for Python. All
- functionalities of MagickWand API are implemented in Wand.
- .
- Wand provides Pythonic and modern interfaces, good documentation and
- binding through ctypes (which works on PyPy)
- .
- This module is built for PyPy.
-
 Package: wand-doc
 Architecture: all
 Multi-Arch: foreign
-Build-Profiles: <!nodoc>
 Section: doc
-Depends: ${misc:Depends},
+Depends: libjs-mathjax,
+         ${misc:Depends},
          ${sphinxdoc:Depends},
-         libjs-mathjax,
 Description: Python interface for ImageMagick library (documentation)
  Wand is a ctypes-based simple ImageMagick binding for Python. All
  functionalities of MagickWand API are implemented in Wand.

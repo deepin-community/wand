@@ -53,6 +53,7 @@ if os.environ.get('READTHEDOCS', 0):
     sys.modules['wand.version'].MAGICK_RELEASE_DATE = None
     sys.modules['wand.version'].QUANTUM_DEPTH = None
     sys.modules['wand.version'].QUANTUM_RANGE = None
+    sys.modules['wand.version'].QUANTUM_SCALE = None
     sys.modules['wand.version'].MAGICK_HDRI = None
 
 # -- General configuration ----------------------------------------------------
@@ -263,6 +264,7 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 
 extlinks = {
     'issue': ('https://github.com/emcconville/wand/issues/%s', '#'),
+    'pull': ('https://github.com/emcconville/wand/pull/%s', '!'),
     'branch': ('https://github.com/emcconville/wand/compare/master...%s', ''),
     'commit': ('https://github.com/emcconville/wand/commit/%s', ''),
     'cli': ('https://imagemagick.org/script/command-line-options.php#%s', '-'),

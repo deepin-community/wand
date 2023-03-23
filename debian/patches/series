@@ -1,2 +1,3 @@
 block_image_url.patch
 no-intersphinx.patch
+use-local-mathjax.patch

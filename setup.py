@@ -32,11 +32,11 @@ else:
     cmdclass = {'test': pytest}
 
 test_requires = [
-    'pytest >= 5.3.5',
+    'pytest >= 7.2.0',
 ]
 
 doc_requires = [
-    'Sphinx >= 2.4.1',
+    'Sphinx >= 5.3.0',
 ]
 
 setup(
@@ -69,6 +69,8 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python :: Implementation :: Stackless',
