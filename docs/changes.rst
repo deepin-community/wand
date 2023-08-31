@@ -7,6 +7,75 @@ Wand Changelog
 ~~~~~~~~~~
 
 
+.. _changelog-0.6.11:
+
+Version 0.6.11
+--------------
+
+Released on January 5th, 2023.
+
+ - Fixed format issue when calling :meth:`Image.convert() <wand.image.Image.convert>`,
+   and :meth:`Image.make_blob() <wand.image.Image.make_blob>` methods. [:issue:`594`]
+ - Fixed storage type size for `"long"` & `"quantum"` values in
+   :meth:`Image.export_pixels() <wand.image.BaseImage.export_pixels>` and
+   :meth:`Image.import_pixels() <wand.image.BaseImage.import_pixels>` methods. [:issue:`596`]
+ - Added ``filter`` parameter to :meth:`Image.distort() <wand.image.BaseImage.distort>` method.
+ - [TEST] Added Python 3.11 to regression tests for `github actions <https://github.com/emcconville/wand/actions>`_.
+ - [TEST] Replaced :mod:`py.path` fixtures with :mod:`pythlib`. [:pull:`607` & :issue:`608` by Louis Sautier]
+ - [TEST] Retired Python2 support from regression testing.
+ - [TEST] Upgraded `Travis CI <https://travis-ci.org/github/emcconville/wand>` build environments.
+
+
+.. _changelog-0.6.10:
+
+Version 0.6.10
+--------------
+
+Released on August 14th, 2022.
+
+ - Fixed segmentation fault during resource allocation on M1 processor. [:issue:`587`]
+ - Fixed additional segmentation faults introduced with ImageMagick 7.1.0-45. [:issue:`587` & :issue:`586`]
+
+
+.. _changelog-0.6.9:
+
+Version 0.6.9
+-------------
+
+Released on August 3rd, 2022.
+
+ - Updated :meth:`Image.fx() <wand.image.BaseImage.fx>` method to raise :class:`~wand.exceptions.WandRuntimeError` if ImageMagick is unable to generate an image. [:issue:`582`]
+ - Fixed :meth:`Image.from_array() <wand.image.Image.from_array>` classmethod to handle Numpy's strided arrays. [:issue:`582`]
+ - Fixed segmentation fault introduced with ImageMagick 7.1.0-45. [:issue:`586`]
+
+
+.. _changelog-0.6.8:
+
+Version 0.6.8
+-------------
+
+Released on July 16th, 2022.
+
+ - Added :meth:`Image.label() <wand.image.BaseImage.label>` method.
+ - Added :meth:`Image.region() <wand.image.BaseImage.region>` method.
+ - Updated :meth:`Image.chop() <wand.image.BaseImage.chop>` method to support ``gravity`` keyword.
+ - Updated :meth:`Image.extent() <wand.image.BaseImage.extent>` method to support ``gravity`` keyword. [:issue:`554`]
+ - Added `.so.9` shared library suffix to :meth:`wand.api.library_paths()` generator when searching :const:`MAGICK_HOME` path.
+ - Added :const:`QUANTUM_SCALE <wand.version.QUANTUM_SCALE>` constant.
+ - Added :meth:`Image.montage() <wand.image.Image.montage>` method. [:issue:`575`]
+ - Added :meth:`Image.roll() <wand.image.BaseImage.roll>` method.
+ - Fixed returned values for :meth:`Image.connected_components() <wand.image.BaseImage.connected_components>` method for ImageMagick 7.1.1. [:issue:`574`]
+ - Fixed :c:func:`MagickSetImageDepth()` C-API method signature. [:issue:`577` by Pavel Borzenkov]
+ - Fixed :meth:`Image.encipher() <wand.image.BaseImage.encipher>` method to call the correct API. [:issue:`578` by Pavel Borzenkov]
+ - [DOC] Improved :class:`~wand.drawing.FontMetrics` documentation. [:issue:`566`]
+ - [TEST] Migrated CI from `travis-ci.org <https://travis-ci.org/github/emcconville/wand>`_ to `travis-ci.com <https://app.travis-ci.com/emcconville/wand>`_.
+ - [TEST] Removed unneeded SVG dependency from regression test.
+ - [TEST] Suppressed :class:`~wand.exceptions.OptionWarning` when testing user errors.
+ - [TEST] Added Python 3.9 regression test for `travis-ci.com <https://app.travis-ci.com/emcconville/wand>`_.
+ - [TEST] Removed Python 3.7 & 3.8 regression test for `travis-ci.com <https://app.travis-ci.com/emcconville/wand>`_.
+ - [TEST] Added Python 3.10 regression tests for `github actions <https://github.com/emcconville/wand/actions>`_.
+
+
 .. _changelog-0.6.7:
 
 Version 0.6.7

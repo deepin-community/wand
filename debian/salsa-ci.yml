@@ -4,5 +4,12 @@ include:
   - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/pipeline-jobs.yml
 
 variables:
+  # The package is marked 'all', which means that these targets is superficial.
+  SALSA_CI_DISABLE_BUILD_PACKAGE_ANY: 1
+  SALSA_CI_DISABLE_CROSSBUILD_ARM64: 1
+
+  # Package has no compiled code.
+  SALSA_CI_DISABLE_BLHC: 1
+
   SALSA_CI_REPROTEST_ARGS: --variations=-kernel
 

@@ -223,7 +223,7 @@ Random Threshold
 
 .. versionadded:: 0.5.7
 
-Applies a random threshold between ``low`` & ``heigh`` values.
+Applies a random threshold between ``low`` & ``high`` values.
 
 .. code-block:: python
 
@@ -318,7 +318,7 @@ unwanted colors.
     from wand.image import Image
 
     with Image(filename='inca_tern.jpg') as img:
-        img.threshold_threshold(threshold='#ace')
+        img.white_threshold(threshold='#ace')
         img.save(filename='threshold_white.jpg')
 
 +-------------------------------------+-------------------------------------------+
