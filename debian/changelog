@@ -1,3 +1,91 @@
+wand (0.6.11-4) unstable; urgency=medium
+
+  * Change BD libmagickwand-dev -> imagemagick-6.q16.
+  * Don't depend on specific library packages. This changes dependencies to
+    imagemagick-6.q16.
+  * Change autopkgtest to use 'autopkgtest-pkg-pybuild'.
+  * Build documentation with intersphinx and Python 3 docs.
+  * Update copyright year on myself.
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Sun, 24 Mar 2024 16:21:36 +0100
+
+wand (0.6.11-3) unstable; urgency=medium
+
+  [ Stephan Lachnit ]
+  * debian/control: recommend libmagickcore-extra package.
+
+  [ Håvard F. Aasen ]
+  * Change BD to libmagickwand-dev. Closes: #1054436
+  * Update metadata for latest patch.
+  * Update runtime dependencies to the latest imagemagick SONAME.
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Fri, 27 Oct 2023 07:08:11 +0200
+
+wand (0.6.11-2) unstable; urgency=medium
+
+  * Add patch from upstream to fix FTBFS with sphinx 7.1. Closes: #1042684
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Mon, 31 Jul 2023 07:30:29 +0200
+
+wand (0.6.11-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Rebase patches.
+  * Update copyright year for upstream.
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Sat, 28 Jan 2023 08:37:35 +0100
+
+wand (0.6.10-2) unstable; urgency=medium
+
+  * Update privacy breach fix with mathjax. This removes
+    dvipng and texlive-latex-extra as BD and changes patch
+    doc-privacy-breach.patch -> use-local-mathjax.patch
+  * Remove 'nodoc' build profile.
+  * Update Standards-Version to 4.6.2, no changes needed.
+  * Add the year 2023 to my debian/* copyright notice.
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Fri, 13 Jan 2023 16:12:48 +0100
+
+wand (0.6.10-1) unstable; urgency=medium
+
+  * New upstream release.
+  * wand-doc: Drop documentation link to long removed Python 2 package.
+  * Stop building pypy package. Closes: #1023022
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Sat, 29 Oct 2022 14:42:23 +0200
+
+wand (0.6.9-1) unstable; urgency=medium
+
+  * New upstream release.
+  * autopkgtest:
+    - Remove libmagickwand-6.q16-6.
+    - Remove autodep8 test.
+  * Remove libmagickcore-6.q16-6-extra as dependency.
+  * Remove 'nocheck' build-profile.
+  * Patches:
+    - Drop Raise-WandRuntimeError-when-IM-doesn-t-emit-exception-582.patch and
+      Fixed-583-Support-strided-numpy-arrays.patch, included upstream.
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Sun, 07 Aug 2022 12:13:49 +0200
+
+wand (0.6.8-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Rebase patches.
+  * Update Standards-Version to 4.6.1
+  * wrap-and-sort -at
+  * Update maintainer name and email.
+  * d/copyright: Add myself under Debian paragraph.
+  * Fix privacy breach with math formulas. We're generating images with latex
+    during build, to prevent loading of JavaScript, when viewing in browser.
+    - Add doc-privacy-breach.patch
+    - Add dvipng and texlive-latex-extra as BD.
+  * Add upstream patches.
+    - Fixed-583-Support-strided-numpy-arrays.patch
+    - Raise-WandRuntimeError-when-IM-doesn-t-emit-exception-582.patch
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Tue, 19 Jul 2022 23:22:45 +0200
+
 wand (0.6.7-1) unstable; urgency=medium
 
   * New upstream version 0.6.7

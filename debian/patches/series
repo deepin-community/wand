@@ -1,2 +1,4 @@
 block_image_url.patch
-no-intersphinx.patch
+use-packaged-docs-for-intersphinx.patch
+use-local-mathjax.patch
+docs-fix-build-with-Sphinx-6.0.0.patch

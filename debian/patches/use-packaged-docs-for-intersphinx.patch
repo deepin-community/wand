@@ -1,0 +1,29 @@
+From: Changwoo Ryu <cwryu@debian.org>
+Date: Sun, 3 Nov 2019 21:28:48 +0100
+Subject: Use packaged docs for intersphinx
+
+Needs dependency on python3-doc.
+
+Forwarded: not-needed
+---
+ docs/conf.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index bebbf93..318d56b 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -260,7 +260,12 @@ man_pages = [
+ 
+ 
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'http://docs.python.org/': None}
++intersphinx_mapping = {
++        'python': (
++            'http://docs.python.org/',
++            '/usr/share/doc/python3/html/objects.inv'
++        )
++}
+ 
+ extlinks = {
+     'issue': ('https://github.com/emcconville/wand/issues/%s', '#'),

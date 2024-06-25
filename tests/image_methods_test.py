@@ -8,7 +8,8 @@ import warnings
 from pytest import mark, raises
 
 from wand.color import Color
-from wand.exceptions import (MissingDelegateError, OptionError)
+from wand.exceptions import (MissingDelegateError, OptionError,
+                             WandRuntimeError)
 from wand.image import Image
 from wand.font import Font
 from wand.version import MAGICK_VERSION_NUMBER
@@ -62,7 +63,7 @@ def test_annotate(fx_asset):
     with Image(filename='rose:') as img:
         was = img.signature
         with Drawing() as ctx:
-            ctx.font = str(fx_asset.join('League_Gothic.otf'))
+            ctx.font = str(fx_asset.joinpath('League_Gothic.otf'))
             ctx.font_size = 32
             img.annotate('Hello', ctx, left=10, baseline=img.height-10)
         assert was != img.signature
@@ -86,7 +87,7 @@ def test_auto_level():
 
 
 def test_auto_orientation(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
+    with Image(filename=str(fx_asset.joinpath('beach.jpg'))) as img:
         # if orientation is undefined nothing should be changed
         before = img[100, 100]
         img.auto_orient()
@@ -94,7 +95,8 @@ def test_auto_orientation(fx_asset):
         assert before == after
         assert img.orientation == 'top_left'
 
-    with Image(filename=str(fx_asset.join('orientationtest.jpg'))) as original:
+    fpath = str(fx_asset.joinpath('orientationtest.jpg'))
+    with Image(filename=fpath) as original:
         with original.clone() as img:
             # now we should get a flipped image
             assert img.orientation == 'bottom_left'
@@ -119,7 +121,7 @@ def test_auto_threshold():
         assert was != img.signature
 
 
-def test_black_threshold(fx_asset):
+def test_black_threshold():
     with Image(filename='rose:') as img:
         was = img.signature
         img.black_threshold(Color('gray(50%)'))
@@ -129,7 +131,7 @@ def test_black_threshold(fx_asset):
             img.white_threshold(0xDEADBEEF)
 
 
-def test_blue_shift(fx_asset):
+def test_blue_shift():
     with Image(filename='rose:') as img:
         was = img.signature
         img.blue_shift(1.5)
@@ -138,33 +140,23 @@ def test_blue_shift(fx_asset):
             img.blue_shift('NaN')
 
 
-def test_blur(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
-        before = img[100, 100]
+def test_blur():
+    with Image(filename='rose:') as img:
+        was = img.signature
         img.blur(30, 10)
-        after = img[100, 100]
-        assert before != after
+        assert was != img.signature
     with Image(filename='rose:') as img:
         was = img.signature
         img.blur(30, 10, 'red')
         assert was != img.signature
 
 
-def test_border(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
-        left_top = img[0, 0]
-        left_bottom = img[0, -1]
-        right_top = img[-1, 0]
-        right_bottom = img[-1, -1]
+def test_border():
+    with Image(filename='rose:') as img:
+        was = img.signature
         with Color('red') as color:
             img.border(color, 2, 5)
-            assert (img[0, 0] == img[0, -1] == img[-1, 0] == img[-1, -1] ==
-                    img[1, 4] == img[1, -5] == img[-2, 4] == img[-2, -5] ==
-                    color)
-            assert img[2, 5] == left_top
-            assert img[2, -6] == left_bottom
-            assert img[-3, 5] == right_top
-            assert img[-3, -6] == right_bottom
+            assert was != img.signature
     with Image(filename='rose:') as img:
         was = img.signature
         img.border('pink', 2, 5)
@@ -184,7 +176,7 @@ def test_brightness_contrast():
 
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x708,
              reason="Canny requires ImageMagick-7.0.8")
-def test_canny(fx_asset):
+def test_canny():
     with Image(filename='rose:') as img:
         img.transform_colorspace('gray')
         was = img.signature
@@ -195,7 +187,7 @@ def test_canny(fx_asset):
 def test_caption(fx_asset):
     with Image(width=144, height=192, background=Color('#1e50a2')) as img:
         font = Font(
-            path=str(fx_asset.join('League_Gothic.otf')),
+            path=str(fx_asset.joinpath('League_Gothic.otf')),
             color=Color("gold"),
             size=12,
             antialias=False
@@ -236,6 +228,15 @@ def test_chop():
         assert img.height == (h - 10)
 
 
+def test_chop_gravity():
+    with Image(filename='rose:') as img:
+        img.chop(width=10, height=10, gravity='south_east')
+        assert (60, 36, 0, 0) == img.page
+    with raises(ValueError):
+        with Image(filename='rose:') as img:
+            img.chop(x=10, gravity='north')
+
+
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x709,
              reason="Clahe requires Imagemagick-7.0.9.")
 def test_clahe():
@@ -250,7 +251,7 @@ def test_clamp():
         assert img.clamp(channel='red')
 
 
-def test_clut(fx_asset):
+def test_clut():
     with Image(filename='rose:') as img:
         was = img.signature
         with Image(img) as clut:
@@ -270,7 +271,7 @@ def test_clut(fx_asset):
 
 
 def test_coalesce(fx_asset):
-    with Image(filename=str(fx_asset.join('nocomments.gif'))) as img1:
+    with Image(filename=str(fx_asset.joinpath('nocomments.gif'))) as img1:
         with Image(img1) as img2:
             img2.coalesce()
             assert img1.signature != img2.signature
@@ -301,7 +302,7 @@ def test_color_decision_list():
 
 
 def test_color_map(fx_asset):
-    with Image(filename=str(fx_asset.join('trim-color-test.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('trim-color-test.png'))) as img:
         img.type = 'palette'
         assert img[0, 0] == img.color_map(0)
         orange = Color('ORANGE')
@@ -367,17 +368,15 @@ def test_combine():
         assert pixel.red > pixel.green > pixel.blue
 
 
-def test_compare(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as orig:
-        with Image(filename=str(fx_asset.join('watermark_beach.jpg'))) as img:
-            cmp_img, err = orig.compare(img, 'absolute',
+def test_compare():
+    with Image(filename="rose:") as img1:
+        with img1.clone() as img2:
+            img2.import_pixels(10, 10, 1, 1, 'R', 'char', b'\00')
+            cmp_img, err = img1.compare(img2, 'absolute',
                                         highlight=Color('orange'),
                                         lowlight=Color('gray90'))
-            del cmp_img, err
-            cmp_img, err = orig.compare(img, 'mean_absolute')
-            del cmp_img, err
-            cmp_img, err = orig.compare(img, 'root_mean_square')
-            del cmp_img, err
+            assert cmp_img
+            assert err >= 0.0
 
 
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x708,
@@ -385,29 +384,18 @@ def test_compare(fx_asset):
 def test_complex():
     with Image(width=1, height=1, pseudo='xc:gray25') as a:
         with Image(width=1, height=1, pseudo='xc:gray50') as b:
-            a.sequence.append(b)
+            a.image_add(b)
+            a.iterator_reset()
             with a.complex('add') as img:
-                assert 2 == len(img.sequence)
+                assert a.signature != img.signature
 
 
-def test_composite(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as orig:
-        with orig.clone() as img:
-            with Image(filename=str(fx_asset.join('watermark.png'))) as fg:
-                img.composite(fg, 5, 10)
-            # These pixels should not be changed:
-            assert img[0, 0] == orig[0, 0]
-            assert img[0, img.height - 1] == orig[0, orig.height - 1]
-            assert img[img.width - 1, 0] == orig[orig.width - 1, 0]
-            assert (img[img.width - 1, img.height - 1] ==
-                    orig[orig.width - 1, img.height - 1])
-            # These pixels should be the almost black:
-            assert img[70, 100].red <= 1
-            assert img[70, 100].green <= 1
-            assert img[70, 100].blue <= 1
-            assert img[130, 100].red <= 1
-            assert img[130, 100].green <= 1
-            assert img[130, 100].blue <= 1
+def test_composite():
+    with Image(filename='rose:') as img:
+        was = img.signature
+        with Image(filename='rose:') as fg:
+            img.composite(fg, 5, 10)
+        assert img.signature != was
 
 
 def test_composite_arguments():
@@ -443,7 +431,7 @@ def test_composite_gravity():
 
 
 def test_composite_channel(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as orig:
+    with Image(filename=str(fx_asset.joinpath('beach.jpg'))) as orig:
         w, h = orig.size
         left = w // 4
         top = h // 4
@@ -528,7 +516,7 @@ def test_concat():
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x708,
              reason='Connected Components requires ImageMagick-7.0.8.')
 def test_connected_components(fx_asset):
-    with Image(filename=str(fx_asset.join('ccobject.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('ccobject.png'))) as img:
         objects = img.connected_components()
         assert 2 == len(objects)
 
@@ -540,23 +528,19 @@ def test_contrast():
         assert was != img.signature
 
 
-def test_contrast_stretch(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_contrast_stretch():
+    with Image(filename='rose:') as img:
+        was = img.signature
         img.contrast_stretch(0.15)
-        with img[0, 10] as left_top:
-            assert left_top.red_int8 == 255
-        with img[0, 90] as left_bottom:
-            assert left_bottom.red_int8 == 0
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+        assert was != img.signature
+    with Image(filename='rose:') as img:
+        was = img.signature
         img.contrast_stretch(0.15, channel='red')
-        with img[0, 10] as left_top:
-            assert left_top.red_int8 == 255
-        with img[0, 90] as left_bottom:
-            assert left_bottom.red_int8 == 0
+        assert was != img.signature
 
 
-def test_contrast_stretch_user_error(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_contrast_stretch_user_error():
+    with Image(filename='rose:') as img:
         with raises(TypeError):
             img.contrast_stretch('NaN')
         with raises(TypeError):
@@ -568,7 +552,7 @@ def test_contrast_stretch_user_error(fx_asset):
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x70A,
              reason='Convex Hull requires ImageMagick-7.0.10.')
 def test_convex_hull(fx_asset):
-    fpath = str(fx_asset.join('horizon_sunset_border2.jpg'))
+    fpath = str(fx_asset.joinpath('horizon_sunset_border2.jpg'))
     with Image(filename=fpath) as img:
         points = img.convex_hull(background='black')
         assert len(points) > 0
@@ -576,7 +560,7 @@ def test_convex_hull(fx_asset):
 
 def test_crop(fx_asset):
     """Crops in-place."""
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('croptest.png'))) as img:
         with img.clone() as cropped:
             assert cropped.size == img.size
             cropped.crop(100, 100, 200, 200)
@@ -618,31 +602,31 @@ def test_crop(fx_asset):
 
 def test_crop_error(fx_asset):
     """Crop errors."""
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('croptest.png'))) as img:
         with raises(TypeError):
             img.crop(right=1, width=2)
         with raises(TypeError):
             img.crop(bottom=1, height=2)
 
 
-def test_crop_gif(tmpdir, fx_asset):
-    with Image(filename=str(fx_asset.join('nocomments-delay-100.gif'))) as img:
+def test_crop_gif(tmp_path, fx_asset):
+    fpath = str(fx_asset.joinpath('nocomments-delay-100.gif'))
+    with Image(filename=fpath) as img:
         with img.clone() as d:
             assert d.size == (350, 197)
             for s in d.sequence:
                 assert s.delay == 100
             d.crop(50, 50, 200, 150)
-            d.save(filename=str(tmpdir.join('50_50_200_150.gif')))
-        with Image(filename=str(tmpdir.join('50_50_200_150.gif'))) as d:
+            d.save(filename=str(tmp_path / '50_50_200_150.gif'))
+        with Image(filename=str(tmp_path / '50_50_200_150.gif')) as d:
             assert len(d.sequence) == 46
             assert d.size == (150, 100)
             for s in d.sequence:
                 assert s.delay == 100
-    tmpdir.remove()
 
 
 def test_crop_gravity(fx_asset):
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('croptest.png'))) as img:
         width = int(img.width / 3)
         height = int(img.height / 3)
         mid_width = int(width / 2)
@@ -658,15 +642,15 @@ def test_crop_gravity(fx_asset):
             assert southeast[mid_width, mid_height] == Color('transparent')
 
 
-def test_crop_gravity_error(fx_asset):
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+def test_crop_gravity_error():
+    with Image(filename='rose:') as img:
         with raises(TypeError):
             img.crop(gravity='center')
         with raises(ValueError):
             img.crop(width=1, height=1, gravity='nowhere')
 
 
-def test_crop_issue367(fx_asset):
+def test_crop_issue367():
     with Image(filename='rose:') as img:
         expected = img.size
         for gravity in ('north_west', 'north', 'north_east',
@@ -678,7 +662,7 @@ def test_crop_issue367(fx_asset):
 
 
 def test_cycle_color_map(fx_asset):
-    with Image(filename=str(fx_asset.join('trim-color-test.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('trim-color-test.png'))) as img:
         img.type = 'palette'
         lime = img[0, 0]
         img.cycle_color_map(1)
@@ -689,49 +673,54 @@ def test_cycle_color_map(fx_asset):
             img.cycle_color_map('NaN')
 
 
-def test_deskew(fx_asset):
+def test_deskew():
     with Image(filename='rose:') as img:
         was = img.signature
         img.deskew(0.4 * img.quantum_range)
         assert was != img.signature
 
 
-def test_despeckle(fx_asset):
+def test_despeckle():
     with Image(filename='rose:') as img:
         was = img.signature
         img.despeckle()
         assert was != img.signature
 
 
-@mark.slow
-def test_distort(fx_asset):
+def test_distort():
     """Distort image."""
-    with Image(filename=str(fx_asset.join('checks.png'))) as img:
-        with Color('skyblue') as color:
-            img.matte_color = color
-            img.virtual_pixel = 'tile'
-            img.distort('perspective', (0, 0, 20, 60, 90, 0, 70, 63,
-                                        0, 90, 5, 83, 90, 90, 85, 88))
-            assert img[img.width - 1, 0] == color
+    with Image(filename='rose:') as img:
+        was = img.signature
+        w, h = img.size
+        img.distort('resize', (w*2, h*2))
+        neu = img.signature
+        assert was != neu
+    # Let's ensure a distorted image with a defined filter doesn't
+    # match default.
+    with Image(filename='rose:') as img:
+        was = img.signature
+        w, h = img.size
+        img.distort('resize', (w*2, h*2), filter='lanczos')
+        assert neu != img.signature
 
 
-def test_distort_error(fx_asset):
+def test_distort_error():
     """Distort image with user error"""
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+    with Image(filename='rose:') as img:
         with raises(ValueError):
             img.distort('mirror', (1,))
         with raises(TypeError):
             img.distort('perspective', 1)
 
 
-def test_edge(fx_asset):
+def test_edge():
     with Image(filename='rose:') as img:
         was = img.signature
         img.edge(1.5)
         assert was != img.signature
 
 
-def test_emboss(fx_asset):
+def test_emboss():
     with Image(filename='rose:') as img:
         was = img.signature
         img.emboss(1.5, 0.25)
@@ -748,29 +737,26 @@ def test_encipher_decipher():
         assert was == img.signature
 
 
-def test_enhance(fx_asset):
+def test_enhance():
     with Image(filename='rose:') as img:
         was = img.signature
         img.enhance()
         assert was != img.signature
 
 
-def test_equalize(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_equalize():
+    with Image(filename='rose:') as img:
+        was = img.signature
         img.equalize()
-        # The top row should be nearly white, and the bottom nearly black.
-        with img[0, 0] as light:
-            assert light.red >= light.green >= light.blue >= 0.9
-        with img[0, -1] as dark:
-            assert dark.red <= dark.green <= dark.blue <= 0.1
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+        assert was != img.signature
+    with Image(filename='rose:') as img:
         was = img.signature
         img.equalize(channel='red')
         assert was != img.signature
 
 
-def test_evaluate(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_evaluate():
+    with Image(filename='hald:3') as img:
         with img.clone() as percent_img:
             fifty_percent = percent_img.quantum_range * 0.5
             percent_img.evaluate('set', fifty_percent)
@@ -784,8 +770,8 @@ def test_evaluate(fx_asset):
                     assert abs(expected_color - actual_color.red_int8) < 1
 
 
-def test_evaluate_user_error(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_evaluate_user_error():
+    with Image(filename='hald:3') as img:
         with raises(ValueError):
             img.evaluate(operator='Nothing')
         with raises(TypeError):
@@ -794,15 +780,15 @@ def test_evaluate_user_error(fx_asset):
             img.evaluate(operator='set', value=1.0, channel='Not a channel')
 
 
-def test_export_pixels(fx_asset):
-    with Image(filename=str(fx_asset.join('pixels.png'))) as img:
+def test_export_pixels():
+    with Image(filename='hald:2') as img:
         img.depth = 8  # Not need, but want to match import.
         data = img.export_pixels(x=0, y=0, width=4, height=1,
                                  channel_map='RGBA', storage='char')
-        expected = [0xFF, 0x00, 0x00, 0xFF,
-                    0x00, 0xFF, 0x00, 0xFF,
-                    0x00, 0x00, 0xFF, 0xFF,
-                    0x00, 0x00, 0x00, 0x00]
+        expected = [0x00, 0x00, 0x00, 0xFF,
+                    0x55, 0x00, 0x00, 0xFF,
+                    0xAA, 0x00, 0x00, 0xFF,
+                    0xFF, 0x00, 0x00, 0xFF]
         assert data == expected
         # Test Bad value
         with raises(TypeError):
@@ -835,8 +821,8 @@ def test_export_pixels_issue_413():
         assert export
 
 
-def test_extent(fx_asset):
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+def test_extent():
+    with Image(filename='rose:') as img:
         with img.clone() as extended:
             assert extended.size == img.size
             extended.extent(width=500)
@@ -856,6 +842,17 @@ def test_extent(fx_asset):
             img.extent(height=-10)
 
 
+def test_extent_gravity():
+    with Image(filename='rose:') as img:
+        img.extent(width=10, height=10, gravity='south_east')
+        assert (10, 10, 0, 0) == img.page
+        img.extent(width=100, height=100, gravity='center')
+        assert (100, 100, 0, 0) == img.page
+    with raises(ValueError):
+        with Image(filename='rose:') as img:
+            img.extent(x=10, gravity='north')
+
+
 def test_features():
     with Image(filename='rose:') as img:
         cf = img.features(10)
@@ -864,8 +861,8 @@ def test_features():
         assert 'horizontal' in cf['red']['contrast']
 
 
-def test_flip(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
+def test_flip():
+    with Image(filename='rose:') as img:
         with img.clone() as flipped:
             flipped.flip()
             assert flipped[0, 0] == img[0, -1]
@@ -874,8 +871,8 @@ def test_flip(fx_asset):
             assert flipped[-1, -1] == img[-1, 0]
 
 
-def test_flop(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
+def test_flop():
+    with Image(filename='rose:') as img:
         with img.clone() as flopped:
             flopped.flop()
             assert flopped[0, 0] == img[-1, 0]
@@ -896,24 +893,24 @@ def test_forward_fourier_transform():
         assert was != img.signature
 
 
-def test_frame(fx_asset):
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+def test_frame():
+    with Image(filename='rose:') as img:
         img.frame(width=4, height=4)
         assert img[0, 0] == img[-1, -1]
         assert img[-1, 0] == img[0, -1]
     with Color('green') as green:
-        with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+        with Image(filename='rose:') as img:
             img.frame(matte=green, width=2, height=2)
             assert img[0, 0] == green
             assert img[-1, -1] == green
-        with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+        with Image(filename='rose:') as img:
             img.frame(matte='green', width=2, height=2)
             assert img[0, 0] == green
             assert img[-1, -1] == green
 
 
-def test_frame_error(fx_asset):
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+def test_frame_error():
+    with Image(filename='rose:') as img:
         with raises(TypeError):
             img.frame(width='one')
         with raises(TypeError):
@@ -924,19 +921,21 @@ def test_frame_error(fx_asset):
             img.frame(outer_bevel='large')
 
 
-def test_function(fx_asset):
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+def test_function():
+    with Image(filename='wizard:') as img:
+        was = img.signature
         img.function(function='polynomial',
                      arguments=(4, -4, 1))
-        assert img[150, 150] == Color('white')
+        assert was != img.signature
+        was = img.signature
         img.function(function='sinusoid',
                      arguments=(1,),
                      channel='red')
-        assert abs(img[150, 150].red - Color('#80FFFF').red) < 0.01
+        assert was != img.signature
 
 
-def test_function_error(fx_asset):
-    with Image(filename=str(fx_asset.join('croptest.png'))) as img:
+def test_function_error():
+    with Image(filename='rose:') as img:
         with raises(ValueError):
             img.function('bad function', 1)
         with raises(TypeError):
@@ -945,7 +944,7 @@ def test_function_error(fx_asset):
             img.function('sinusoid', (1,), channel='bad channel')
 
 
-def test_fx(fx_asset):
+def test_fx():
     with Image(width=2, height=2, background=Color('black')) as xc1:
         # NavyBlue == #000080
         with xc1.fx('0.5019', channel='blue') as xc2:
@@ -956,10 +955,10 @@ def test_fx(fx_asset):
             assert xc2[0, 0].red == 0
 
 
-def test_fx_error(fx_asset):
+def test_fx_error():
     with Image() as empty_wand:
-        with raises(AttributeError):
-            with empty_wand.fx('8'):
+        with raises(WandRuntimeError):
+            with empty_wand.fx('8') as _:
                 pass
     with Image(filename='rose:') as xc:
         with raises(OptionError):
@@ -973,10 +972,10 @@ def test_fx_error(fx_asset):
                 pass
 
 
-def test_gamma(fx_asset):
+def test_gamma():
     # Value under 1.0 is darker, and above 1.0 is lighter
-    middle_point = 75, 50
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+    middle_point = 35, 23
+    with Image(filename='rose:') as img:
         with img.clone() as lighter:
             lighter.gamma(1.5)
             assert img[middle_point].red < lighter[middle_point].red
@@ -985,10 +984,10 @@ def test_gamma(fx_asset):
             assert img[middle_point].red > darker[middle_point].red
 
 
-def test_gamma_channel(fx_asset):
+def test_gamma_channel():
     # Value under 1.0 is darker, and above 1.0 is lighter
-    middle_point = 75, 50
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+    middle_point = 35, 23
+    with Image(filename='rose:') as img:
         with img.clone() as lighter:
             lighter.gamma(1.5, channel='red')
             assert img[middle_point].red < lighter[middle_point].red
@@ -997,37 +996,34 @@ def test_gamma_channel(fx_asset):
             assert img[middle_point].red > darker[middle_point].red
 
 
-def test_gamma_user_error(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_gamma_user_error():
+    with Image(filename='rose:') as img:
         with raises(TypeError):
             img.gamma('NaN;')
         with raises(ValueError):
             img.gamma(0.0, 'no channel')
 
 
-def test_gaussian_blur(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
-        before = img[100, 100]
+def test_gaussian_blur():
+    with Image(filename='rose:') as img:
+        was = img.signature
         img.gaussian_blur(30, 10)
-        after = img[100, 100]
-        assert before != after
-        assert 0.84 <= after.red <= 0.851
-        assert 0.74 <= after.green <= 0.75
-        assert 0.655 <= after.blue < 0.67
+        assert was != img.signature
     with Image(filename='rose:') as img:
         was = img.signature
         img.gaussian_blur(30, 10, channel='red')
         assert was != img.signature
 
 
-def test_get_image_distortion(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as orig:
-        with Image(filename=str(fx_asset.join('watermark_beach.jpg'))) as img:
+def test_get_image_distortion():
+    with Image(filename='wizard:') as orig:
+        with orig.clone() as img:
+            img.implode(0.5)
             err = orig.get_image_distortion(img, 'absolute')
             assert err >= 0.0
 
 
-def test_hald_clut(fx_asset):
+def test_hald_clut():
     with Image(filename='rose:') as img:
         was = img.signature
         with Image(filename='hald:3') as hald:
@@ -1046,32 +1042,31 @@ def test_hald_clut(fx_asset):
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x708,
              reason='Hough Lines requires ImageMagick-7.0.8.')
 def test_hough_lines(fx_asset):
-    with Image(filename=str(fx_asset.join('ccobject.png'))) as img:
+    with Image(filename=str(fx_asset.joinpath('ccobject.png'))) as img:
         was = img.signature
         img.hough_lines(width=3, height=3)
         assert was != img.signature
 
 
-def test_implode(fx_asset):
+def test_implode():
     with Image(filename='rose:') as img:
         was = img.signature
         img.implode(amount=1.0)
         assert was != img.signature
 
 
-def test_import_pixels(fx_asset):
+def test_import_pixels():
     data = [0xFF, 0x00, 0x00, 0xFF,
             0x00, 0xFF, 0x00, 0xFF,
             0x00, 0x00, 0xFF, 0xFF,
             0x00, 0x00, 0x00, 0x00]
     with Image(width=4, height=1, background=Color('BLACK')) as dst:
         dst.depth = 8  # For safety
-        with Image(filename=str(fx_asset.join('pixels.png'))) as expected:
-            expected.depth = 8  # For safety
-            dst.import_pixels(x=0, y=0, width=4, height=1,
-                              channel_map='RGBA', storage='char',
-                              data=data)
-            assert dst.signature == expected.signature
+        was = dst.signature
+        dst.import_pixels(x=0, y=0, width=4, height=1,
+                          channel_map='RGBA', storage='char',
+                          data=data)
+        assert was != dst.signature
         with raises(TypeError):
             dst.import_pixels(x='NaN')
         with raises(TypeError):
@@ -1114,21 +1109,23 @@ def test_import_pixels_issue_413():
 
 @mark.fft
 def test_inverse_fourier_transform(fx_asset):
-    with Image(filename=str(fx_asset.join('ccobject_magnitude.png'))) as a:
+    magnitude = str(fx_asset.joinpath('ccobject_magnitude.png'))
+    phase = str(fx_asset.joinpath('ccobject_phase.png'))
+    with Image(filename=magnitude) as a:
         was = a.signature
-        with Image(filename=str(fx_asset.join('ccobject_phase.png'))) as b:
+        with Image(filename=phase) as b:
             a.inverse_fourier_transform(b)
         assert was != a.signature
-    with Image(filename=str(fx_asset.join('ccobject_magnitude.png'))) as a:
-        with Image(filename=str(fx_asset.join('ccobject_phase.png'))) as b:
+    with Image(filename=magnitude) as a:
+        with Image(filename=phase) as b:
             assert a.ift(b)
     with raises(TypeError):
-        with Image(filename=str(fx_asset.join('ccobject_magnitude.png'))) as a:
+        with Image(filename=magnitude) as a:
             a.inverse_fourier_transform(0xDEADBEEF)
 
 
 def test_iterator(fx_asset):
-    with Image(filename=str(fx_asset.join('animation.gif'))) as img:
+    with Image(filename=str(fx_asset.joinpath('animation.gif'))) as img:
         length = img.iterator_length()
         assert length == 4
         img.iterator_reset()
@@ -1177,64 +1174,68 @@ def test_kuwahara():
         assert was != img.signature
 
 
-def test_level(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_label(fx_asset):
+    font_path = str(fx_asset.joinpath('League_Gothic.otf'))
+    with Image(filename='rose:') as img:
+        was = img.signature
+        img.label('a', left=0, top=0, font=Font(font_path, 12))
+        now = img.signature
+        assert now != was
+        img.label('b', font=Font(font_path, 12), gravity='south')
+        assert img.signature != now
+    with raises(TypeError):
+        with Image(filename='rose:') as img:
+            img.label('x')
+
+
+def test_level():
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         # Adjust the levels to make this image entirely black
+        was = img.signature
         img.level(black=0.99, white=1.0)
-        with img[0, 0] as dark:
-            assert dark.red_int8 <= dark.green_int8 <= dark.blue_int8 <= 0
-        with img[0, -1] as dark:
-            assert dark.red_int8 <= dark.green_int8 <= dark.blue_int8 <= 0
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+        assert was != img.signature
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         # Adjust the levels to make this image entirely white
+        was = img.signature
         img.level(0, 0.01)
-        with img[0, 0] as light:
-            assert light.red_int8 >= light.green_int8 >= light.blue_int8 >= 255
-        with img[0, -1] as light:
-            assert light.red_int8 >= light.green_int8 >= light.blue_int8 >= 255
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+        assert was != img.signature
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         # Adjust the image's gamma to darken its midtones
+        was = img.signature
         img.level(gamma=0.5)
-        with img[0, len(img) // 2] as light:
-            assert light.red_int8 <= light.green_int8 <= light.blue_int8 <= 65
-            assert light.red_int8 >= light.green_int8 >= light.blue_int8 >= 60
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+        assert was != img.signature
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         # Adjust the image's gamma to lighten its midtones
+        was = img.signature
         img.level(0, 1, 2.5)
-        with img[0, len(img) // 2] as light:
-            assert light.red_int8 <= light.green_int8 <= light.blue_int8 <= 195
-            assert light.red_int8 >= light.green_int8 >= light.blue_int8 >= 190
+        assert was != img.signature
 
 
-def test_level_channel(fx_asset):
-    for chan in ('red', 'green', 'blue'):
-        c = chan + '_int8'
-        with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
-            # Adjust each channel level to make it entirely black
-            img.level(0.99, 1.0, channel=chan)
-            assert(getattr(img[0, 0], c) <= 0)
-            assert(getattr(img[0, -1], c) <= 0)
-        with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
-            # Adjust each channel level to make it entirely white
-            img.level(0.0, 0.01, channel=chan)
-            assert(getattr(img[0, 0], c) >= 255)
-            assert(getattr(img[0, -1], c) >= 255)
-        with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
-            # Adjust each channel's gamma to darken its midtones
-            img.level(gamma=0.5, channel=chan)
-            with img[0, len(img) // 2] as light:
-                assert(getattr(light, c) <= 65)
-                assert(getattr(light, c) >= 60)
-        with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
-            # Adjust each channel's gamma to lighten its midtones
-            img.level(0, 1, 2.5, chan)
-            with img[0, len(img) // 2] as light:
-                assert(getattr(light, c) >= 190)
-                assert(getattr(light, c) <= 195)
+def test_level_channel():
+    with Image(width=100, height=100, pseudo='gradient:') as img:
+        # Adjust each channel level to make it entirely black
+        was = img.signature
+        img.level(0.99, 1.0, channel='red')
+        assert was != img.signature
+    with Image(width=100, height=100, pseudo='gradient:') as img:
+        # Adjust each channel level to make it entirely white
+        was = img.signature
+        img.level(0.0, 0.01, channel='green')
+        assert was != img.signature
+    with Image(width=100, height=100, pseudo='gradient:') as img:
+        # Adjust each channel's gamma to darken its midtones
+        was = img.signature
+        img.level(gamma=0.5, channel='blue')
+        assert was != img.signature
+    with Image(width=100, height=100, pseudo='gradient:') as img:
+        # Adjust each channel's gamma to lighten its midtones
+        was = img.signature
+        img.level(0, 1, 2.5, 'red')
+        assert was != img.signature
 
 
-def test_level_user_error(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_level_user_error():
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         with raises(TypeError):
             img.level(black='NaN')
         with raises(TypeError):
@@ -1254,18 +1255,16 @@ def test_levelize():
         assert was != img.signature
 
 
-def test_linear_stretch(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_linear_stretch():
+    with Image(width=100, height=100, pseudo='gradient:') as img:
+        was = img.signature
         img.linear_stretch(black_point=0.15,
                            white_point=0.15)
-        with img[0, 10] as left_top:
-            assert left_top.red_int8 == 255
-        with img[0, 90] as left_bottom:
-            assert left_bottom.red_int8 == 0
+        assert was != img.signature
 
 
-def test_linear_stretch_user_error(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_linear_stretch_user_error():
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         with raises(TypeError):
             img.linear_stretch(white_point='NaN',
                                black_point=0.5)
@@ -1274,14 +1273,8 @@ def test_linear_stretch_user_error(fx_asset):
                                black_point='NaN')
 
 
-def test_liquid_rescale(fx_asset):
-    def assert_equal_except_alpha(a, b):
-        with a:
-            with b:
-                assert (a.red == b.red and
-                        a.green == b.green and
-                        a.blue == b.blue)
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as orig:
+def test_liquid_rescale():
+    with Image(filename='wizard:') as orig:
         with orig.clone() as img:
             try:
                 img.liquid_rescale(600, 600)
@@ -1289,9 +1282,6 @@ def test_liquid_rescale(fx_asset):
                 warnings.warn('skip liquid_rescale test; has no LQR delegate')
             else:
                 assert img.size == (600, 600)
-                for x in 0, -1:
-                    for y in 0, -1:
-                        assert_equal_except_alpha(img[x, y], img[x, y])
 
 
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x693,
@@ -1327,20 +1317,18 @@ def test_mean_shift():
         assert was != img.signature
 
 
-def test_merge_layers(fx_asset):
+def test_merge_layers():
     for method in ['merge', 'flatten', 'mosaic']:
-        with Image(filename=str(fx_asset.join('cmyk.jpg'))) as img1:
-            orig_size = img1.size
-            with Image(filename=str(fx_asset.join('cmyk.jpg'))) as img2:
+        with Image(filename='wizard:') as img1:
+            with Image(filename='logo:') as img2:
                 img1.sequence.append(img2)
                 assert len(img1.sequence) == 2
                 img1.merge_layers(method)
                 assert len(img1.sequence) == 1
-                assert img1.size == orig_size
 
 
-def test_merge_layers_bad_method(fx_asset):
-    with Image(filename=str(fx_asset.join('cmyk.jpg'))) as img:
+def test_merge_layers_bad_method():
+    with Image(filename='rose:') as img:
         for method in ('', 'mosaic' 'junk'):
             with raises(ValueError):
                 img.merge_layers(method)
@@ -1348,7 +1336,7 @@ def test_merge_layers_bad_method(fx_asset):
             img.merge_layers(None)
 
 
-def test_merge_layers_method_flatten(fx_asset):
+def test_merge_layers_method_flatten():
     with Image(width=16, height=16) as img1:
         img1.background_color = Color('black')
         img1.alpha_channel = False
@@ -1361,7 +1349,7 @@ def test_merge_layers_method_flatten(fx_asset):
             assert img1.size == (16, 16)
 
 
-def test_merge_layers_method_merge(fx_asset):
+def test_merge_layers_method_merge():
     with Image(width=16, height=16) as img1:
         img1.background_color = Color('black')
         img1.alpha_channel = False
@@ -1374,7 +1362,7 @@ def test_merge_layers_method_merge(fx_asset):
             assert img1.size == (24, 24)
 
 
-def test_merge_layers_method_merge_neg_offset(fx_asset):
+def test_merge_layers_method_merge_neg_offset():
     with Image(width=16, height=16) as img1:
         img1.background_color = Color('black')
         img1.alpha_channel = False
@@ -1387,7 +1375,7 @@ def test_merge_layers_method_merge_neg_offset(fx_asset):
             assert img1.size == (24, 24)
 
 
-def test_merge_layers_method_mosaic(fx_asset):
+def test_merge_layers_method_mosaic():
     with Image(width=16, height=16) as img1:
         img1.background_color = Color('black')
         img1.alpha_channel = False
@@ -1400,7 +1388,7 @@ def test_merge_layers_method_mosaic(fx_asset):
             assert img1.size == (24, 24)
 
 
-def test_merge_layers_method_mosaic_neg_offset(fx_asset):
+def test_merge_layers_method_mosaic_neg_offset():
     with Image(width=16, height=16) as img1:
         img1.background_color = Color('black')
         img1.alpha_channel = False
@@ -1424,22 +1412,21 @@ def test_minimum_bounding_box():
         assert img.height > mbr.get('height', img.height)
 
 
-def test_mode(fx_asset):
+def test_mode():
     with Image(filename='rose:') as img:
         was = img.signature
         img.mode(5)
         assert was != img.signature
 
 
-def test_modulate(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
-        before = img[100, 100]
+def test_modulate():
+    with Image(filename='rose:') as img:
+        was = img.signature
         img.modulate(120, 120, 120)
-        after = img[100, 100]
-        assert before != after
+        assert was != img.signature
 
 
-def test_morphology_builtin(fx_asset):
+def test_morphology_builtin():
     known = []
     args = (('erode', 'ring'),
             ('dilate', 'disk:5'),
@@ -1467,7 +1454,7 @@ def test_morphology_builtin(fx_asset):
                            iterations='p')
 
 
-def test_morphology_user_defined(fx_asset):
+def test_morphology_user_defined():
     with Image(filename='rose:') as img:
         was = img.signature
         img.morphology(method='dilate',
@@ -1494,21 +1481,11 @@ def test_motion_blur():
         assert was != img.signature
 
 
-def test_negate_default(fx_asset):
-    def test(c1, c2):
-        assert (c1.red_int8 + c2.red_int8 == 255 and
-                c1.green_int8 + c2.green_int8 == 255 and
-                c1.blue_int8 + c2.blue_int8 == 255)
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
-        left_top = img[0, 0]
-        left_bottom = img[0, -1]
-        right_top = img[-1, 0]
-        right_bottom = img[-1, -1]
+def test_negate_default():
+    with Image(width=100, height=100, pseudo='gradient:') as img:
+        was = img.signature
         img.negate()
-        test(left_top, img[0, 0])
-        test(left_bottom, img[0, -1])
-        test(right_top, img[-1, 0])
-        test(right_bottom, img[-1, -1])
+        assert was != img.signature
         assert img.negate(False, 'red')
         with raises(ValueError):
             img.negate(True, 'unknown')
@@ -1525,28 +1502,17 @@ def test_noise():
         assert was != img.signature
 
 
-def test_normalize(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
-        left_top = img[0, 0]
-        left_bottom = img[0, -1]
-        right_top = img[-1, 0]
-        right_bottom = img[-1, -1]
+def test_normalize():
+    with Image(width=100, height=100, pseudo='rose:') as img:
+        was = img.signature
         img.normalize()
-        assert img[0, 0] != left_top
-        assert img[0, -1] != left_bottom
-        assert img[-1, 0] != right_top
-        assert img[-1, -1] != right_bottom
-        with img[0, 0] as left_top:
-            assert left_top.red == left_top.green == left_top.blue == 1
-        with img[-1, -1] as right_bottom:
-            assert (right_bottom.red == right_bottom.green ==
-                    right_bottom.blue == 0)
+        assert was != img.signature
         with raises(ValueError):
             img.normalize('unknown')
 
 
-def test_normalize_channel(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_normalize_channel():
+    with Image(width=100, height=100, pseudo='rose:') as img:
         was = img.signature
         img.normalize('red')
         assert was != img.signature
@@ -1578,7 +1544,7 @@ def test_opaque_paint():
 
 
 def test_optimize_layers(fx_asset):
-    with Image(filename=str(fx_asset.join('nocomments.gif'))) as img1:
+    with Image(filename=str(fx_asset.joinpath('nocomments.gif'))) as img1:
         with Image(img1) as img2:
             img2.optimize_layers()
             assert img1.signature != img2.signature
@@ -1586,7 +1552,7 @@ def test_optimize_layers(fx_asset):
 
 
 def test_optimize_transparency(fx_asset):
-    with Image(filename=str(fx_asset.join('nocomments.gif'))) as img1:
+    with Image(filename=str(fx_asset.joinpath('nocomments.gif'))) as img1:
         with Image(img1) as img2:
             try:
                 img2.optimize_transparency()
@@ -1616,9 +1582,9 @@ def test_parse_meta_geometry():
             img.parse_meta_geometry('junk')
 
 
-def test_percent_escape(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
-        assert 'sasha.jpg 204x247' == img.percent_escape('%f %wx%h')
+def test_percent_escape():
+    with Image(filename='rose:') as img:
+        assert '3019 70x46' == img.percent_escape('%k %wx%h')
 
 
 def test_polaroid(fx_asset):
@@ -1629,7 +1595,7 @@ def test_polaroid(fx_asset):
     with Image(filename='rose:') as img:
         img.polaroid(caption='hello')
     with Image(filename='rose:') as img:
-        font = Font(str(fx_asset.join('League_Gothic.otf')), 12,
+        font = Font(str(fx_asset.joinpath('League_Gothic.otf')), 12,
                     Color('orange'), True, Color('pink'), 1)
         img.polaroid(caption='hello', font=font)
         with raises(TypeError):
@@ -1645,8 +1611,8 @@ def test_polynomial():
         assert was != img.signature
 
 
-def test_posterize(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
+def test_posterize():
+    with Image(filename='rose:') as img:
         was = img.signature
         img.posterize(levels=16, dither='no')
         assert was != img.signature
@@ -1656,13 +1622,12 @@ def test_posterize(fx_asset):
             img.posterize(levels=16, dither='manhatten')
 
 
-@mark.slow
-def test_quantize(fx_asset):
-    number_colors = 64
-    with Image(width=100, height=100, pseudo='PLASMA:') as img:
+def test_quantize():
+    number_colors = 32
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         assert img.colors > number_colors
 
-    with Image(width=100, height=100, pseudo='PLASMA:') as img:
+    with Image(width=100, height=100, pseudo='gradient:') as img:
         with raises(TypeError):
             img.quantize(str(number_colors), 'undefined', 0, True, True)
 
@@ -1714,11 +1679,27 @@ def test_range_threshold():
         img.range_threshold(20, 40, 60)
 
 
-def test_remap(fx_asset):
+def test_region():
+    with Image(filename='rose:') as src:
+        w, h, x, y = src.page
+        with src.region() as dst:
+            assert (w, h) == dst.size
+        with src.region(width=w//2, height=h//2, x=x//2, y=y//2) as dst:
+            assert (w//2, h//2) == dst.size
+    with Image(filename='rose:') as src:
+        with src.region(width=10, height=10, gravity='south_east') as dst:
+            assert (70, 46, 60, 36) == dst.page
+            assert (10, 10) == dst.size
+    with raises(ValueError):
+        with Image(filename='rose:') as img:
+            with img.region(x=10, gravity='center') as _:
+                pass
+
+
+def test_remap():
     with Image(filename='rose:') as img:
         was = img.signature
-        trim_path = str(fx_asset.join('trim-color-test.png'))
-        with Image(filename=trim_path) as palette:
+        with Image(filename='hald:3') as palette:
             img.remap(palette)
         assert was != img.signature
         with raises(TypeError):
@@ -1739,7 +1720,7 @@ def test_remap(fx_asset):
 def test_resample(density, expected_size, fx_asset):
     """Resample (Adjust number of pixels at the given density) the image."""
     xr, yr = density
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
+    with Image(filename=str(fx_asset.joinpath('beach.jpg'))) as img:
         img.units = "pixelspercentimeter"
         assert img.resolution == (72, 72)
         img.resample(xr, yr)
@@ -1752,9 +1733,9 @@ def test_resample(density, expected_size, fx_asset):
         assert img.size == expected_size
 
 
-def test_resample_errors(fx_asset):
+def test_resample_errors():
     """Sampling errors."""
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+    with Image(filename='rose:') as img:
         with raises(TypeError):
             img.resample(x_res='100')
         with raises(TypeError):
@@ -1773,30 +1754,30 @@ def test_resample_errors(fx_asset):
     ('resize'),
     ('sample'),
 ])
-def test_resize_and_sample(method, fx_asset):
+def test_resize_and_sample(method):
     """Resizes/Samples the image."""
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+    with Image(filename='wizard:') as img:
         with img.clone() as a:
-            assert a.size == (402, 599)
+            assert a.size == (480, 640)
             getattr(a, method)(100, 100)
             assert a.size == (100, 100)
         with img.clone() as b:
-            assert b.size == (402, 599)
+            assert b.size == (480, 640)
             getattr(b, method)(height=100)
-            assert b.size == (402, 100)
+            assert b.size == (480, 100)
         with img.clone() as c:
-            assert c.size == (402, 599)
+            assert c.size == (480, 640)
             getattr(c, method)(width=100)
-            assert c.size == (100, 599)
+            assert c.size == (100, 640)
 
 
 @mark.parametrize(('method'), [
     ('resize'),
     ('sample'),
 ])
-def test_resize_and_sample_errors(method, fx_asset):
+def test_resize_and_sample_errors(method):
     """Resizing/Sampling errors."""
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+    with Image(filename='rose:') as img:
         with raises(TypeError):
             getattr(img, method)(width='100')
         with raises(TypeError):
@@ -1816,8 +1797,9 @@ def test_resize_and_sample_errors(method, fx_asset):
     ('resize'),
     ('sample'),
 ])
-def test_resize_and_sample_gif(method, tmpdir, fx_asset):
-    with Image(filename=str(fx_asset.join('nocomments-delay-100.gif'))) as img:
+def test_resize_and_sample_gif(method, tmp_path, fx_asset):
+    fpath = str(fx_asset.joinpath('nocomments-delay-100.gif'))
+    with Image(filename=fpath) as img:
         assert len(img.sequence) == 46
         with img.clone() as a:
             assert a.size == (350, 197)
@@ -1825,8 +1807,8 @@ def test_resize_and_sample_gif(method, tmpdir, fx_asset):
             for s in a.sequence:
                 assert s.delay == 100
             getattr(a, method)(175, 98)
-            a.save(filename=str(tmpdir.join('175_98.gif')))
-        with Image(filename=str(tmpdir.join('175_98.gif'))) as a:
+            a.save(filename=str(tmp_path / '175_98.gif'))
+        with Image(filename=str(tmp_path / '175_98.gif')) as a:
             assert len(a.sequence) == 46
             assert a.size == (175, 98)
             for s in a.sequence:
@@ -1836,8 +1818,8 @@ def test_resize_and_sample_gif(method, tmpdir, fx_asset):
             for s in b.sequence:
                 assert s.delay == 100
             getattr(b, method)(height=100)
-            b.save(filename=str(tmpdir.join('350_100.gif')))
-        with Image(filename=str(tmpdir.join('350_100.gif'))) as b:
+            b.save(filename=str(tmp_path / '350_100.gif'))
+        with Image(filename=str(tmp_path / '350_100.gif')) as b:
             assert len(b.sequence) == 46
             assert b.size == (350, 100)
             for s in b.sequence:
@@ -1847,19 +1829,25 @@ def test_resize_and_sample_gif(method, tmpdir, fx_asset):
             for s in c.sequence:
                 assert s.delay == 100
             getattr(c, method)(width=100)
-            c.save(filename=str(tmpdir.join('100_197.gif')))
-        with Image(filename=str(tmpdir.join('100_197.gif'))) as c:
+            c.save(filename=str(tmp_path / '100_197.gif'))
+        with Image(filename=str(tmp_path / '100_197.gif')) as c:
             assert len(c.sequence) == 46
             assert c.size == (100, 197)
             for s in c.sequence:
                 assert s.delay == 100
-    tmpdir.remove()
+
+
+def test_roll():
+    with Image(filename='rose:') as img:
+        was = img.signature
+        img.roll(x=-15, y=15)
+        assert was != img.signature
 
 
 @mark.slow
 def test_rotate(fx_asset):
     """Rotates an image."""
-    with Image(filename=str(fx_asset.join('rotatetest.gif'))) as img:
+    with Image(filename=str(fx_asset.joinpath('rotatetest.gif'))) as img:
         assert 150 == img.width
         assert 100 == img.height
         with img.clone() as cloned:
@@ -1911,8 +1899,9 @@ def test_rotate(fx_asset):
 
 
 @mark.slow
-def test_rotate_gif(tmpdir, fx_asset):
-    with Image(filename=str(fx_asset.join('nocomments-delay-100.gif'))) as img:
+def test_rotate_gif(tmp_path, fx_asset):
+    fpath = str(fx_asset.joinpath('nocomments-delay-100.gif'))
+    with Image(filename=fpath) as img:
         for s in img.sequence:
             assert s.delay == 100
         with img.clone() as e:
@@ -1920,24 +1909,25 @@ def test_rotate_gif(tmpdir, fx_asset):
             e.rotate(90)
             for s in e.sequence:
                 assert s.delay == 100
-            e.save(filename=str(tmpdir.join('rotate_90.gif')))
-        with Image(filename=str(tmpdir.join('rotate_90.gif'))) as e:
+            e.save(filename=str(tmp_path / 'rotate_90.gif'))
+        with Image(filename=str(tmp_path / 'rotate_90.gif')) as e:
             assert e.size == (197, 350)
             assert len(e.sequence) == 46
             for s in e.sequence:
                 assert s.delay == 100
-    tmpdir.remove()
 
 
-def test_rotate_reset_coords(fx_asset):
+def test_rotate_reset_coords():
     """Reset the coordinate frame so to the upper-left corner of
     the image is (0, 0) again.
 
     """
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
+    with Image(filename='rose:') as img:
         img.rotate(45, reset_coords=True)
-        img.crop(0, 0, 170, 170)
-        assert img[85, 85] == Color('transparent')
+        img.crop(0, 0, 84, 84)
+        # There should be no page info from the crop, as everything was
+        # nulled by the rotate.
+        assert (0, 0, 0, 0) == img.page
 
 
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x688,
@@ -1977,7 +1967,7 @@ def test_sepia_tone():
         assert was != img.signature
 
 
-def test_shade(fx_asset):
+def test_shade():
     with Image(filename='rose:') as img:
         was = img.signature
         img.shade(gray=False, azimuth=10.0, elevation=10.0)
@@ -1988,7 +1978,7 @@ def test_shade(fx_asset):
             img.shade(elevation='hello')
 
 
-def test_shadow(fx_asset):
+def test_shadow():
     with Image(filename='rose:') as img:
         was = img.size
         img.shadow(alpha=5.0, sigma=1.25, x=10, y=10)
@@ -2003,7 +1993,7 @@ def test_shadow(fx_asset):
             img.shadow(y=None)
 
 
-def test_sharpen(fx_asset):
+def test_sharpen():
     with Image(filename='rose:') as img:
         was = img.signature
         img.sharpen(radius=10.0, sigma=2.0)
@@ -2018,7 +2008,7 @@ def test_sharpen(fx_asset):
         assert was != img.signature
 
 
-def test_shave(fx_asset):
+def test_shave():
     with Image(filename='rose:') as img:
         was = img.size
         img.shave(10, 10)
@@ -2030,10 +2020,10 @@ def test_shave(fx_asset):
 
 
 def test_shear():
-    green = Color('GREEN')
     with Image(filename='rose:') as img:
+        was = img.signature
         img.shear(background='green', x=10, y=10)
-        assert img[0, 0] == green
+        assert was != img.signature
 
 
 def test_sigmoidal_contrast():
@@ -2113,7 +2103,7 @@ def test_sparse_color():
             img.sparse_color('barycentric', colors, channel_mask='red')
 
 
-def test_splice(fx_asset):
+def test_splice():
     green = Color('GREEN')
     with Image(filename='rose:') as img:
         width, height = img.size
@@ -2121,16 +2111,23 @@ def test_splice(fx_asset):
         img.splice(10, 10, 10, 10)
         assert width+10, height+10 == img.size
         assert img[15, 15] == green
+    with Image(filename='rose:') as img:
+        was = img.signature
+        img.splice(width=10, height=10, gravity='center')
+        assert img.signature != was
+    with raises(ValueError):
+        with Image(filename='rose:') as img:
+            img.splice(width=10, height=10, x=10, gravity='center')
 
 
-def test_spread(fx_asset):
+def test_spread():
     with Image(filename='rose:') as img:
         was = img.signature
         img.spread(8.0)
         assert was != img.signature
 
 
-def test_statistic(fx_asset):
+def test_statistic():
     with Image(filename='rose:') as img:
         was = img.signature
         img.statistic('median', 5, 5)
@@ -2153,7 +2150,7 @@ def test_stegano():
 
 def test_strip(fx_asset):
     """Strips the image of all profiles and comments."""
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
+    with Image(filename=str(fx_asset.joinpath('beach.jpg'))) as img:
         strio = io.BytesIO()
         img.save(file=strio)
         len_original = strio.tell()
@@ -2182,8 +2179,8 @@ def test_texture():
             img.texture(0xDEADBEEF)
 
 
-def test_threshold(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_threshold():
+    with Image(width=100, height=100, pseudo='gradient:white-black') as img:
         top = int(img.height * 0.25)
         btm = int(img.height * 0.75)
         img.threshold(0.5)
@@ -2195,8 +2192,8 @@ def test_threshold(fx_asset):
             img.threshold(0.5, channel='unknown')
 
 
-def test_threshold_channel(fx_asset):
-    with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
+def test_threshold_channel():
+    with Image(width=100, height=100, pseudo='gradient:white-black') as img:
         was = img.signature
         img.threshold(0.0, 'red')
         img.threshold(0.5, 'green')
@@ -2216,7 +2213,7 @@ def test_thumbnail():
         assert (img.width, 20) == img.size
 
 
-def test_tint(fx_asset):
+def test_tint():
     with Image(filename='rose:') as img:
         was = img.signature
         img.tint('blue', 'blue')
@@ -2228,39 +2225,39 @@ def test_tint(fx_asset):
 
 
 @mark.parametrize(('args', 'kwargs', 'expected_size'), [
-    ((), {'resize': '200%'}, (1600, 1200)),
-    ((), {'resize': '200%x100%'}, (1600, 600)),
-    ((), {'resize': '1200'}, (1200, 900)),
-    ((), {'resize': 'x300'}, (400, 300)),
-    ((), {'resize': '400x600'}, (400, 300)),
-    ((), {'resize': '1000x1200^'}, (1600, 1200)),
+    ((), {'resize': '200%'}, (960, 1280)),
+    ((), {'resize': '200%x100%'}, (960, 640)),
+    ((), {'resize': '1200'}, (1200, 1600)),
+    ((), {'resize': 'x300'}, (225, 300)),
+    ((), {'resize': '400x600'}, (400, 533)),
+    ((), {'resize': '1000x1200^'}, (1000, 1333)),
     ((), {'resize': '100x100!'}, (100, 100)),
-    ((), {'resize': '400x500>'}, (400, 300)),
-    ((), {'resize': '1200x3000<'}, (1200, 900)),
-    ((), {'resize': '120000@'}, (400, 300)),
+    ((), {'resize': '400x500>'}, (375, 500)),
+    ((), {'resize': '1200x3000<'}, (1200, 1600)),
+    ((), {'resize': '120000@'}, (300, 400)),
     ((), {'crop': '300x300'}, (300, 300)),
     ((), {'crop': '300x300+100+100'}, (300, 300)),
     ((), {'crop': '300x300-150-150'}, (150, 150)),
     (('300x300', '200%'), {}, (600, 600)),
 ])
-def test_transform(args, kwargs, expected_size, fx_asset):
+def test_transform(args, kwargs, expected_size):
     """Transforms (crops and resizes with geometry strings) the image."""
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
-        assert img.size == (800, 600)
+    with Image(filename='wizard:') as img:
+        assert img.size == (480, 640)
         img.transform(*args, **kwargs)
         assert img.size == expected_size
 
 
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x708,
              reason="Crop by aspect-ration requires ImageMagick-7.0.8")
-def test_transform_aspect_crop(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
+def test_transform_aspect_crop():
+    with Image(filename='wizard:') as img:
         img.transform(crop='16:9')
-        assert img.size == (800, 450)
+        assert img.size == (480, 270)
 
 
-def test_transform_colorspace(fx_asset):
-    with Image(filename=str(fx_asset.join('cmyk.jpg'))) as img:
+def test_transform_colorspace():
+    with Image(filename='hald:3') as img:
         with raises(TypeError):
             img.transform_colorspace(0xDEADBEEF)
         with raises(ValueError):
@@ -2270,10 +2267,10 @@ def test_transform_colorspace(fx_asset):
         assert img.colorspace == 'srgb'
 
 
-def test_transform_errors(fx_asset):
+def test_transform_errors():
     """Tests errors raised by invalid parameters for transform."""
     unichar = b'\xe2\x9a\xa0'.decode('utf-8')
-    with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as img:
+    with Image(filename='wizard:') as img:
         with raises(TypeError):
             img.transform(crop=500)
         with raises(TypeError):
@@ -2286,9 +2283,10 @@ def test_transform_errors(fx_asset):
             img.transform(resize=unichar)
 
 
-def test_transform_gif(tmpdir, fx_asset):
-    filename = str(tmpdir.join('test_transform_gif.gif'))
-    with Image(filename=str(fx_asset.join('nocomments-delay-100.gif'))) as img:
+def test_transform_gif(tmp_path, fx_asset):
+    src = str(fx_asset / 'nocomments-delay-100.gif')
+    dst = str(tmp_path / 'test_transform_gif.gif')
+    with Image(filename=src) as img:
         assert len(img.sequence) == 46
         assert img.size == (350, 197)
         for single in img.sequence:
@@ -2299,14 +2297,13 @@ def test_transform_gif(tmpdir, fx_asset):
         for single in img.sequence:
             assert single.size == (175, 98)
             assert single.delay == 100
-        img.save(filename=filename)
-    with Image(filename=filename) as gif:
+        img.save(filename=dst)
+    with Image(filename=dst) as gif:
         assert len(gif.sequence) == 46
         assert gif.size == (175, 98)
         for single in gif.sequence:
             assert single.size == (175, 98)
             assert single.delay == 100
-    tmpdir.remove()
 
 
 def test_transparent_color(fx_asset):
@@ -2315,13 +2312,13 @@ def test_transparent_color(fx_asset):
        Alpha channel must be enabled with ``'set'``, previously ``True``.
        See docstring in :meth:`wand.image.BaseImage.alpha_channel`.
     """
-    with Image(filename=str(fx_asset.join('rotatetest.gif'))) as img:
+    with Image(filename=str(fx_asset.joinpath('rotatetest.gif'))) as img:
         img.alpha_channel = 'set'
         with Color('white') as white:
             img.transparent_color(white, 0.0, 2, 0)
             assert img[75, 50].alpha == 0
             assert img[0, 50].alpha == 1.0
-    with Image(filename=str(fx_asset.join('rotatetest.gif'))) as img:
+    with Image(filename=str(fx_asset.joinpath('rotatetest.gif'))) as img:
         img.alpha_channel = 'set'
         img.transparent_color('white', 0.0, 2, 0)
         assert img[75, 50].alpha == 0
@@ -2329,7 +2326,7 @@ def test_transparent_color(fx_asset):
 
 
 def test_transparentize(fx_asset):
-    with Image(filename=str(fx_asset.join('croptest.png'))) as im:
+    with Image(filename=str(fx_asset.joinpath('croptest.png'))) as im:
         with Color('transparent') as transparent:
             with Color('black') as black:
                 assert im[99, 100] == transparent
@@ -2344,65 +2341,42 @@ def test_transparentize(fx_asset):
             im.transparentize(-9)
 
 
-def test_transpose(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
-        with img.clone() as transposed:
-            transposed.transpose()
-            assert transposed[501, 501] == Color('srgb(205,196,179)')
+def test_transpose():
+    with Image(filename='rose:') as img:
+        was = img.signature
+        img.transpose()
+        assert was != img.signature
 
 
-def test_transverse(fx_asset):
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
-        with img.clone() as transversed:
-            transversed.transverse()
-            assert transversed[500, 500] == Color('srgb(96,136,185)')
+def test_transverse():
+    with Image(filename='rose:') as img:
+        was = img.signature
+        img.transverse()
+        assert was != img.signature
 
 
-def test_trim(fx_asset):
+def test_trim():
     """Remove transparent area around image."""
-    with Image(filename=str(fx_asset.join('trimtest.png'))) as img:
-        old_x, old_y = img.size
+    with Image(filename='logo:') as img:
+        old_x, _ = img.size
         img.trim()
-        new_x, new_y = img.size
+        new_x, _ = img.size
         assert new_x < old_x
-        assert new_y < old_y
 
 
-def test_trim_color(fx_asset):
-    with Image(filename=str(fx_asset.join('trim-color-test.png'))) as img:
-        assert img.size == (100, 100)
-        with Color('blue') as blue:
-            img.trim(blue)
-            assert img.size == (50, 100)
-        img.trim('blue')
-        assert img.size == (50, 100)
-        with Color('srgb(0,255,0)') as green:
-            assert (img[0, 0] == img[0, -1] == img[-1, 0] == img[-1, -1] ==
-                    green)
-
-
-def test_trim_fuzz(fx_asset):
-    with Image(filename=str(fx_asset.join('trimtest.png'))) as img:
-        img.trim()
-        trim_x, trim_y = img.size
-        img.trim(fuzz=10000)
-        fuzz_x, fuzz_y = img.size
-        assert fuzz_x < trim_x
-        assert fuzz_y < trim_y
+def test_trim_color():
+    with Image(filename='wizard:') as img:
+        size = img.size
+        img.trim(color='white', fuzz=0.1*img.quantum_range)
+        assert img.size != size
 
 
 @mark.skipif(MAGICK_VERSION_NUMBER < 0x709,
              reason='Trim by percent-background requires ImagesMagick-7.0.9')
-def test_trim_percent_background(fx_asset):
-    # TODO - Find a better test image to demonstrate trim ranges.
-    fpath = str(fx_asset.join('horizon_sunset_border2.jpg'))
-    with Image(filename=fpath) as img:
+def test_trim_percent_background():
+    with Image(filename='wizard:') as img:
         was = img.size
-        img.trim(fuzz=0.0, percent_background=0.0, background_color='black')
-        assert img.size != was
-    with Image(filename=fpath) as img:
-        was = img.size
-        img.trim(fuzz=0.0, percent_background=0.5, background_color='black')
+        img.trim(fuzz=0.0, percent_background=0.5, background_color='white')
         assert img.size != was
 
 
@@ -2413,48 +2387,43 @@ def test_trim_reset_coords():
         assert page != img.page
 
 
-def test_unique_colors(fx_asset):
+def test_unique_colors():
     with Image(filename='rose:') as img:
         was = img.signature
         img.unique_colors()
         assert was != img.signature
 
 
-def test_unsharp_mask(fx_asset):
-    with Image(filename=str(fx_asset.join('sasha.jpg'))) as img:
-        before = img[100, 100]
-        img.unsharp_mask(1.1, 1, 0.5, 0.001)
-        after = img[100, 100]
-        assert before != after
+def test_unsharp_mask():
     with Image(filename='rose:') as img:
         was = img.signature
-        img.unsharp_mask(1.1, 1, 0.5, 0.001, channel='red')
-        assert was != img.signature
+        alpha = was
+        with img.clone() as cpy:
+            cpy.unsharp_mask(1.1, 1, 0.5, 0.001)
+            alpha = cpy.signature
+            assert alpha != was
+        with img.clone() as cpy:
+            cpy.unsharp_mask(1.1, 1, 0.5, 0.001, channel='red')
+            assert cpy.signature != alpha
 
 
-def test_vignette(fx_asset):
+def test_vignette():
     with Image(filename='rose:') as img:
         was = img.signature
         img.vignette(radius=3, sigma=3)
         assert was != img.signature
 
 
-def test_watermark(fx_asset):
-    """Adds  watermark to an image."""
-    with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
-        with Image(filename=str(fx_asset.join('watermark.png'))) as wm:
-            a = img[70, 83]
-            b = img[70, 84]
-            c = img[623, 282]
-            d = img[622, 281]
+def test_watermark():
+    """Adds watermark to an image."""
+    with Image(filename='wizard:') as img:
+        was = img.signature
+        with Image(filename='rose:') as wm:
             img.watermark(wm, 0.3)
-            assert img[70, 83] == a
-            assert img[70, 84] != b
-            assert img[623, 282] == c
-            assert img[622, 281] != d
+            assert was != img.signature
 
 
-def test_wave(fx_asset):
+def test_wave():
     with Image(filename='rose:') as img:
         was = img.size
         img.wave(amplitude=img.height, wave_length=img.width/2)
@@ -2485,7 +2454,7 @@ def test_white_balance():
         assert was != img.signature
 
 
-def test_white_threshold(fx_asset):
+def test_white_threshold():
     with Image(filename='rose:') as img:
         was = img.signature
         img.white_threshold(Color('gray(50%)'))

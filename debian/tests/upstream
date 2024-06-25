@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-for py in $(py3versions -s); do
-    echo "[*] testing $py:"
-    $py -m pytest
-done
