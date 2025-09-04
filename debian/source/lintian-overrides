@@ -1,0 +1,2 @@
+# wand does not support pyproject.toml until the 0.7.x release
+missing-prerequisite-for-pyproject-backend setuptools.build_meta (does not satisfy python3-setuptools:any, pybuild-plugin-pyproject:any) [pyproject.toml:5]
