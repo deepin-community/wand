@@ -1,3 +1,21 @@
+wand (0.6.13-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Rebase patches.
+  * Update Standards-Version to 4.7.1, no changes needed.
+  * Update copyright year for myself.
+  * Add lintian override for missing dependency on pyproject.toml.
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Sat, 22 Feb 2025 09:59:42 +0100
+
+wand (0.6.11-5) unstable; urgency=medium
+
+  * Change dependency to unversioned ImageMagick, fixes build against
+    ImageMagick version 7. Closes: #1086936
+  * Update Standards-Version to 4.7.0, no changes needed
+
+ -- Håvard F. Aasen <havard.f.aasen@pfft.no>  Fri, 08 Nov 2024 06:56:56 +0100
+
 wand (0.6.11-4) unstable; urgency=medium
 
   * Change BD libmagickwand-dev -> imagemagick-6.q16.

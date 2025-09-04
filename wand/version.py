@@ -47,7 +47,6 @@ except ImportError:  # pragma: no cover
     libmagick = None
 from .compat import binary, string_type, text
 
-
 __all__ = ('VERSION', 'VERSION_INFO', 'MAGICK_VERSION',
            'MAGICK_VERSION_DELEGATES', 'MAGICK_VERSION_FEATURES',
            'MAGICK_VERSION_INFO', 'MAGICK_VERSION_NUMBER',
@@ -59,7 +58,7 @@ __all__ = ('VERSION', 'VERSION_INFO', 'MAGICK_VERSION',
 #:
 #: .. versionchanged:: 0.1.9
 #:    Becomes :class:`tuple`.  (It was string before.)
-VERSION_INFO = (0, 6, 11)
+VERSION_INFO = (0, 6, 13)
 
 #: (:class:`basestring`) The version string e.g. ``'0.1.2'``.
 #:

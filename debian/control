@@ -4,13 +4,13 @@ Priority: optional
 Maintainer: Håvard F. Aasen <havard.f.aasen@pfft.no>
 Build-Depends: debhelper-compat (=13),
                dh-python,
-               imagemagick-6.q16,
+               imagemagick,
                python3-all,
                python3-doc <!nodoc>,
                python3-pytest,
                python3-setuptools,
                python3-sphinx,
-Standards-Version: 4.6.2
+Standards-Version: 4.7.1
 Rules-Requires-Root: no
 Testsuite: autopkgtest-pkg-pybuild
 Homepage: https://github.com/emcconville/wand
@@ -19,9 +19,8 @@ Vcs-Browser: https://salsa.debian.org/debian/wand
 
 Package: python3-wand
 Architecture: all
-Depends: imagemagick-6.q16,
+Depends: imagemagick,
          ${misc:Depends},
-         ${shlibs:Depends},
          ${python3:Depends},
 Suggests: wand-doc,
 Description: Python interface for ImageMagick library (Python 3)

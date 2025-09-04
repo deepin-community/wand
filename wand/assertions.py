@@ -8,6 +8,7 @@ This module checks user input before calling MagickWands C-API methods.
 """
 
 import numbers
+
 try:
     from collections.abc import Sequence
 except ImportError:
@@ -55,7 +56,7 @@ def assert_counting_number(**kwargs):
     assert_integer(**kwargs)
     for label, subject in kwargs.items():
         if subject < 1:
-            fmt = "{0}={1} must be an natural number greater than 0"
+            fmt = "{0}={1} must be a natural number greater than 0"
             msg = fmt.format(label, subject)
             raise ValueError(msg)
 

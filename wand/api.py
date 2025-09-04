@@ -14,9 +14,11 @@ import os.path
 import platform
 import sys
 import traceback
+
 # Forward import for backwards compatibility.
 from .cdefs.structures import (AffineMatrix, MagickPixelPacket, PixelInfo,
                                PointInfo)
+
 if platform.system() == "Windows":
     try:
         import winreg
@@ -114,7 +116,10 @@ def library_paths():
             libmagick = ctypes.util.find_library('libMagickCore' + suffix)
             yield libwand, libmagick
         else:
+            libmagick = ctypes.util.find_library('MagickCore' + suffix)
             libwand = ctypes.util.find_library('MagickWand' + suffix)
+            if libmagick is not None:
+                yield libwand, libmagick
             yield libwand, libwand
 
 
@@ -189,8 +194,8 @@ library = libraries[0]
 libmagick = libraries[1]
 
 try:
-    from wand.cdefs import (core, magick_wand, magick_image, magick_property,
-                            pixel_iterator, pixel_wand, drawing_wand)
+    from wand.cdefs import (core, drawing_wand, magick_image, magick_property,
+                            magick_wand, pixel_iterator, pixel_wand)
 
     core.load(libmagick)
     # Let's get the magick-version number to pass to load methods.

@@ -7,6 +7,42 @@ Wand Changelog
 ~~~~~~~~~~
 
 
+.. _changelog-0.6.12:
+
+Version 0.6.13
+--------------
+
+Released on November 3rd, 2023.
+
+ - Removed broken `pyproject.toml` file from source distribution.
+
+
+.. _changelog-0.6.12:
+
+Version 0.6.12
+--------------
+
+Released on November 3rd, 2023.
+
+ - Fixed behavior when passing zero to :meth:`Image.chop() <wand.image.BaseImage.chop>`. [:issue:`622`]
+ - Fixed `libmagick` yield `MagickCore` library on Linux. [:issue:`612`]
+ - Fixed removing mask when passing :const:`None` to :meth:`Image.write_mask() <wand.image.BaseImage.write_mask>` method. [:issue:`636`]
+ - Added new :const:`COMPOSITE_OPERATORS <wand.image.COMPOSITE_OPERATORS>` operators. [:issue:`627` by druzhynin-oleksii]
+
+   - ``'freeze'``
+   - ``'interpolate'``
+   - ``'negate'``
+   - ``'reflect'``
+   - ``'rmse'``
+   - ``'saliency'``
+   - ``'seamless_blend'``
+   - ``'soft_burn'``
+   - ``'soft_dodge'``
+   - ``'stamp'``
+
+ - [DOC] Updated Sphinx version to 7.2.6
+
+
 .. _changelog-0.6.11:
 
 Version 0.6.11
@@ -1282,7 +1318,7 @@ Released on October 4, 2011. Still alpha version.
 - Added :meth:`Image.resize() <wand.image.BaseImage.resize>` method.
 - Added :meth:`Image.save() <wand.image.Image.save>` method.
 - Added :meth:`Image.clone() <wand.image.BaseImage.clone>` method.
-- Drawed `the pretty logo picture <_static/wand.png>`_
+- Drew `the pretty logo picture <_static/wand.png>`_
   (thanks to `Hyojin Choi <http://me2day.net/crocodile>`_).
 
 
